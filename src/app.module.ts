@@ -3,21 +3,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { DBModule } from './database/db.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'mysql',
-        database: config.get<string>('DB_NAME'),
-        username: config.get<string>('DB_USERNAME'),
-        password: config.get<string>('DB_PASSWORD'),
-        entities: [],
-        synchronize: true,
-      }),
+    ConfigModule.forRoot({
+      isGlobal: true,
     }),
+    DBModule,
   ],
   controllers: [AppController],
   providers: [AppService],
