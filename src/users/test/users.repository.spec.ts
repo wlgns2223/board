@@ -68,4 +68,25 @@ describe('UsersRepository', () => {
     );
     expect(result).toEqual(fakeUser);
   });
+
+  it('should create a user', async () => {
+    const fakeUser = {
+      email: 'fake@gmail.com',
+      password: 'password',
+    };
+
+    const queryMock = jest.fn().mockResolvedValue([fakeUser]);
+    jest.spyOn(usersRepository['conn'], 'query').mockImplementation(queryMock);
+
+    const result = await usersRepository.createUser(
+      fakeUser.email,
+      fakeUser.password,
+    );
+
+    expect(queryMock).toHaveBeenCalledWith(
+      'INSERT INTO users (email,password) VALUES (?,?)',
+      [fakeUser.email, fakeUser.password],
+    );
+    expect(result).toEqual(true);
+  });
 });

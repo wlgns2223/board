@@ -10,4 +10,10 @@ export class UsersRepository {
     const result = await this.conn.query(sql, [email]);
     return result[0];
   }
+
+  async createUser(email: string, password: string) {
+    const sql = `INSERT INTO users (email,password) VALUES (?,?)`;
+    const result = await this.conn.query(sql, [email, password]);
+    return true;
+  }
 }
