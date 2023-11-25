@@ -38,7 +38,7 @@ describe('UsersRepository', () => {
     const result = await usersRepository.getUserByEmail(fakeUser.email);
 
     //Assert
-    expect(result).toEqual([fakeUser]);
+    expect(result).toEqual(fakeUser);
     expect(query).toHaveBeenCalledWith(`SELECT * FROM users WHERE email = ?`, [
       fakeUser.email,
     ]);
@@ -66,6 +66,6 @@ describe('UsersRepository', () => {
       'SELECT * FROM users WHERE email = ?',
       [email],
     );
-    expect(result).toEqual([fakeUser]);
+    expect(result).toEqual(fakeUser);
   });
 });

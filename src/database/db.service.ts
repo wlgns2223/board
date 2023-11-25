@@ -18,8 +18,12 @@ export class DBService {
     });
   }
 
+  /**
+   *  Row가 배열임
+   */
   async query(sql: string, values?: any): Promise<any> {
     const conn = await this.pool.getConnection();
+
     try {
       const [rows, fields] = await conn.query(sql, values);
       return rows;

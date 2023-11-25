@@ -8,6 +8,6 @@ export class UsersRepository {
   async getUserByEmail(email: string) {
     const sql = `SELECT * FROM users WHERE email = ?`;
     const result = await this.conn.query(sql, [email]);
-    return result;
+    return result[0];
   }
 }
