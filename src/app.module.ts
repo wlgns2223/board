@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DBModule } from './database/db.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { DBModule } from './database/db.module';
       isGlobal: true,
     }),
     DBModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
