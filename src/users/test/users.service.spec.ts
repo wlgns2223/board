@@ -2,10 +2,20 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from '../users.service';
 import { UsersRepository } from '../users.repository';
 import * as bcrypt from 'bcrypt';
+import { BadRequestException } from '@nestjs/common';
+import { CreateUserDto } from '../dto/create.dto';
+
+const getUserByEmailMock = jest.fn();
+const createUserMock = jest.fn();
 
 describe('UsersService', () => {
   let usersService: UsersService;
   let usersRepository: UsersRepository;
+  const fakeUserCreateDto: CreateUserDto = {
+    email: 'test@gmail.com',
+    password: 'password',
+    nickname: 'nickname',
+  };
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -13,8 +23,8 @@ describe('UsersService', () => {
         {
           provide: UsersRepository,
           useValue: {
-            getUserByEmail: jest.fn(),
-            createUser: jest.fn().mockResolvedValue(true),
+            getUserByEmail: getUserByEmailMock,
+            createUser: createUserMock,
           },
         },
       ],
@@ -28,21 +38,37 @@ describe('UsersService', () => {
   });
 
   it('should create a user', async () => {
-    const email = 'test@gmail.com';
-    const password = 'password';
     const salt: any = 'salt';
     const hashed = 'hashed';
 
+    const expected = {
+      ...fakeUserCreateDto,
+      password: hashed,
+    };
+
     jest.spyOn(bcrypt, 'genSalt').mockResolvedValue(salt as never);
     jest.spyOn(bcrypt, 'hash').mockResolvedValue(hashed as never);
+    createUserMock.mockResolvedValue(expected);
 
-    const result = await usersService.createUser(email, password);
+    const result = await usersService.createUser(fakeUserCreateDto);
 
-    expect(result).toBe(true);
+    expect(result).toBe(expected);
     expect(bcrypt.genSalt).toHaveBeenCalled();
-    expect(bcrypt.hash).toHaveBeenCalledWith(password, salt);
-    expect(usersRepository.createUser).toHaveBeenCalledWith(email, hashed);
+    expect(bcrypt.hash).toHaveBeenCalledWith(fakeUserCreateDto.password, salt);
+    expect(usersRepository.createUser).toHaveBeenCalledWith(expected);
   });
 
-  it.todo('완전한 isolation으로 테스트를 진행해보자');
+  it('should throw an error if user already exists', async () => {
+    getUserByEmailMock.mockResolvedValue(fakeUserCreateDto);
+
+    await expect(usersService.createUser(fakeUserCreateDto)).rejects.toThrow(
+      BadRequestException,
+    );
+
+    await expect(usersService.createUser(fakeUserCreateDto)).rejects.toThrow(
+      'User already exists',
+    );
+  });
+
+  it.todo('should update');
 });
