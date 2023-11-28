@@ -1,7 +1,6 @@
-import { Exclude } from 'class-transformer';
+export type UserAttrs = Omit<User, 'id' | 'createdAt' | 'updatedAt'>;
 
 export class User {
-  @Exclude()
   id: string;
   email: string;
   nickname: string;
@@ -13,7 +12,15 @@ export class User {
     Object.assign(this, partial);
   }
 
-  static fromPlain(plain: User): User {
-    return new User(plain);
+  static fromPlain(plain: Partial<User>): User {
+    return new User({
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      email: '',
+      id: '',
+      nickname: '',
+      password: '',
+      ...plain,
+    });
   }
 }

@@ -1,7 +1,7 @@
 import { IsEmail, IsNotEmpty } from 'class-validator';
-import { User } from '../user.model';
+import { User, UserAttrs } from '../user.model';
 
-export class CreateUserDto implements Partial<User> {
+export class CreateUserDto implements UserAttrs {
   @IsEmail()
   email: string;
 

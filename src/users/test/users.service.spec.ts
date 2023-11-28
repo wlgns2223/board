@@ -7,6 +7,7 @@ import { CreateUserDto } from '../dto/create.dto';
 
 const getUserByEmailMock = jest.fn();
 const createUserMock = jest.fn();
+const updateUserMock = jest.fn();
 
 describe('UsersService', () => {
   let usersService: UsersService;
@@ -25,6 +26,7 @@ describe('UsersService', () => {
           useValue: {
             getUserByEmail: getUserByEmailMock,
             createUser: createUserMock,
+            updateUser: updateUserMock,
           },
         },
       ],
@@ -52,7 +54,7 @@ describe('UsersService', () => {
 
     const result = await usersService.createUser(fakeUserCreateDto);
 
-    expect(result).toBe(expected);
+    expect(result).toEqual(expected);
     expect(bcrypt.genSalt).toHaveBeenCalled();
     expect(bcrypt.hash).toHaveBeenCalledWith(fakeUserCreateDto.password, salt);
     expect(usersRepository.createUser).toHaveBeenCalledWith(expected);
@@ -70,5 +72,37 @@ describe('UsersService', () => {
     );
   });
 
-  it.todo('should update');
+  it('should update a user', async () => {
+    const expected = {
+      ...fakeUserCreateDto,
+      nickname: 'newNickname',
+    };
+    updateUserMock.mockResolvedValue(expected);
+
+    const result = await usersService.updateUser(
+      fakeUserCreateDto.email,
+      expected,
+    );
+
+    expect(result).toEqual(expected);
+    expect(updateUserMock).toHaveBeenCalledWith(
+      fakeUserCreateDto.email,
+      expected,
+    );
+  });
+
+  it("should throw an error when user doesn't exist", async () => {
+    getUserByEmailMock.mockResolvedValue(undefined);
+    const expected = {
+      ...fakeUserCreateDto,
+      nickname: 'newNickname',
+    };
+
+    await expect(
+      usersService.updateUser(fakeUserCreateDto.email, expected),
+    ).rejects.toThrow(BadRequestException);
+    await expect(
+      usersService.updateUser(fakeUserCreateDto.email, expected),
+    ).rejects.toThrow('User does not exist');
+  });
 });

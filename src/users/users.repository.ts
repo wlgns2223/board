@@ -9,21 +9,25 @@ export class UsersRepository {
   constructor(private conn: DBService) {}
 
   async getUserByEmail(email: string) {
-    const sql = `SELECT * FROM users WHERE email = ?`;
+    const userKeys = Object.keys(User.fromPlain({}))
+      .filter((key) => key != 'password')
+      .join(',');
+
+    const sql = `SELECT ${userKeys} FROM users WHERE email = ?`;
     const result = await this.conn.query(sql, [email]);
     return result[0];
   }
 
   async createUser(createDto: CreateUserDto) {
     let user: User | undefined = undefined;
-    const values =
-      '(' +
-      Object.values(createDto)
-        .map((value) => '?')
-        .join(',') +
-      ')';
+
+    const columns = Object.keys(createDto).join(',');
+    const values = Object.values(createDto)
+      .map((value) => '?')
+      .join(',');
+
     try {
-      const sql = `INSERT INTO users VALUES ${values}`;
+      const sql = `INSERT INTO users (${columns}) VALUES (${values})`;
       await this.conn.query(sql, [...Object.values(createDto)]);
       user = await this.getUserByEmail(createDto.email);
     } catch (error) {
@@ -36,13 +40,13 @@ export class UsersRepository {
   async updateUser(email: string, attrs: Partial<User>) {
     let result: User | undefined = undefined;
     try {
-      const update = Object.keys(attrs)
-        .map((key) => `${key} = ?`)
+      const update = Object.entries(attrs)
+        .map(([key, value]) => `${key} = "${value}"`)
         .join(', ');
-      const values = Object.values(attrs);
 
-      const sql = `UPDATE users SET ${update} WHERE email = ${email}`;
-      await this.conn.query(sql, [...values, email]);
+      const sql = `UPDATE users SET ${update} WHERE email = "${email}"`;
+
+      await this.conn.query(sql, [email]);
 
       result = await this.getUserByEmail(email);
     } catch (error) {

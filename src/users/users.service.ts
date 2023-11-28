@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create.dto';
+import { UpdateUserDto } from './dto/update.dto';
 
 @Injectable()
 export class UsersService {
@@ -24,5 +25,14 @@ export class UsersService {
       ...createDto,
       password: hashed,
     });
+  }
+
+  async updateUser(email: string, updateUserDto: UpdateUserDto) {
+    const user = await this.userRepository.getUserByEmail(email);
+    if (!user) {
+      throw new BadRequestException('User does not exist');
+    }
+
+    return await this.userRepository.updateUser(email, updateUserDto);
   }
 }

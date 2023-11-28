@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersRepository } from '../users.repository';
 import { DBService } from '../../database/db.service';
 import { CreateUserDto } from '../dto/create.dto';
+import { UpdateUserDto } from '../dto/update.dto';
+import { User } from '../user.model';
 
 const query = jest.fn();
 
@@ -34,40 +36,17 @@ describe('UsersRepository', () => {
   it('should return user by email', async () => {
     //Arange
     query.mockResolvedValue([fakeUser]);
+    const userKeys = Object.keys(User.fromPlain({}))
+      .filter((key) => key !== 'password')
+      .join(',');
+    const sql = `SELECT ${userKeys} FROM users WHERE email = ?`;
 
     //Act
     const result = await usersRepository.getUserByEmail(fakeUser.email);
 
     //Assert
     expect(result).toEqual(fakeUser);
-    expect(query).toHaveBeenCalledWith(`SELECT * FROM users WHERE email = ?`, [
-      fakeUser.email,
-    ]);
-  });
-
-  it('should return user by email', async () => {
-    /**
-     * AI generated test
-     */
-
-    // Arrange
-    const email = 'email@gmail.com';
-    const fakeUser = {
-      email: 'email@gmail.com',
-      password: 'password',
-    };
-    const queryMock = jest.fn().mockResolvedValue([fakeUser]);
-    jest.spyOn(usersRepository['conn'], 'query').mockImplementation(queryMock);
-
-    // Act
-    const result = await usersRepository.getUserByEmail(email);
-
-    // Assert
-    expect(queryMock).toHaveBeenCalledWith(
-      'SELECT * FROM users WHERE email = ?',
-      [email],
-    );
-    expect(result).toEqual(fakeUser);
+    expect(query).toHaveBeenCalledWith(sql, [fakeUser.email]);
   });
 
   it('should create a user', async () => {
@@ -77,46 +56,41 @@ describe('UsersRepository', () => {
       nickname: 'nickname',
     };
 
-    const queryMock = jest.fn().mockResolvedValue([fakeCreateUserDto]);
-    jest.spyOn(usersRepository['conn'], 'query').mockImplementation(queryMock);
+    query.mockResolvedValue([fakeCreateUserDto]);
+    const columns = Object.keys(fakeCreateUserDto).join(',');
+    const values = Object.values(fakeCreateUserDto)
+      .map((value) => '?')
+      .join(',');
+
+    const sql = `INSERT INTO users (${columns}) VALUES (${values})`;
 
     const result = await usersRepository.createUser(fakeCreateUserDto);
 
-    const values =
-      '(' +
-      Object.values(fakeCreateUserDto)
-        .map((value) => '?')
-        .join(',') +
-      ')';
-    expect(queryMock).toHaveBeenCalledWith(
-      `INSERT INTO users VALUES ${values}`,
-      [...Object.values(fakeCreateUserDto)],
-    );
+    expect(query).toHaveBeenCalledWith(sql, [
+      ...Object.values(fakeCreateUserDto),
+    ]);
     expect(result).toEqual(fakeCreateUserDto);
   });
 
   it('should update a user', async () => {
-    const email = 'test@gmail.com';
-    const toUpdate = {
-      nickname: 'newNickname',
+    const updateDto: UpdateUserDto = {
+      nickname: 'newNickName',
     };
 
     const expected = {
-      email,
-      ...toUpdate,
+      ...fakeUser,
+      ...updateDto,
     };
-    query.mockResolvedValue([expected]);
-    jest.spyOn(usersRepository, 'getUserByEmail').mockResolvedValue(expected);
-    const result = await usersRepository.updateUser(email, toUpdate);
 
-    const update = Object.keys(toUpdate)
-      .map((key) => `${key} = ?`)
+    const columns = Object.entries(updateDto)
+      .map(([key, value]) => `${key} = ${value}`)
       .join(', ');
-    const values = Object.values(toUpdate);
-    expect(query).toHaveBeenCalledWith(
-      `UPDATE users SET ${update} WHERE email = ${email}`,
-      [...values, email],
-    );
+    const sql = `UPDATE users SET ${columns} WHERE email = ${fakeUser.email}`;
+    query.mockResolvedValue([expected]);
+
+    const result = await usersRepository.updateUser(fakeUser.email, updateDto);
+
+    expect(query).toHaveBeenCalledWith(sql, [fakeUser.email]);
     expect(result).toEqual(expected);
   });
 });
