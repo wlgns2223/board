@@ -28,8 +28,9 @@ export class DBService {
       const [rows, fields] = await conn.query(sql, values);
       return rows;
     } catch (error) {
-      this.logger.error('CONNECTING TO DB FAILED');
+      this.logger.error('Query: ' + sql);
       this.logger.error(error);
+      throw new Error(error);
     } finally {
       conn.release();
     }
