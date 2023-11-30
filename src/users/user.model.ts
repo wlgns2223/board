@@ -1,4 +1,5 @@
-export type UserAttrs = Omit<User, 'id' | 'createdAt' | 'updatedAt'>;
+export interface UserAttrs
+  extends Omit<User, 'id' | 'createdAt' | 'updatedAt'> {}
 
 export class User {
   id: string;

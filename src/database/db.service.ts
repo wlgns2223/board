@@ -7,6 +7,34 @@ export class DBService {
   private pool: mysql.Pool;
   private logger = new Logger(DBService.name);
 
+  private toColumns(obj: any) {
+    return `( ${Object.keys(obj).join(',')} )`;
+  }
+
+  private toValues(obj: any) {
+    return `( ${Object.values(obj)
+      .map((value) => `"${value}"`)
+      .join(',')} )`;
+  }
+
+  private toPlaceholders(obj: any) {
+    return `( ${Object.values(obj)
+      .map((value) => '?')
+      .join(',')} )`;
+  }
+
+  helpInsert(obj: any) {
+    const columns = this.toColumns(obj);
+    const values = this.toValues(obj);
+    const placesholders = this.toPlaceholders(obj);
+
+    return {
+      columns,
+      values,
+      placesholders,
+    };
+  }
+
   constructor(configService: ConfigService) {
     this.pool = mysql.createPool({
       host: configService.get<string>('DB_HOST'),
@@ -26,7 +54,7 @@ export class DBService {
 
     try {
       const [rows, fields] = await conn.query(sql, values);
-      return rows;
+      return;
     } catch (error) {
       this.logger.error('Query: ' + sql);
       this.logger.error(error);

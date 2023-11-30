@@ -1,4 +1,7 @@
-export class Posts {
+export interface PostAttrs
+  extends Omit<Post, 'postId' | 'createdAt' | 'updatedAt'> {}
+
+export class Post {
   postId: string;
   title: string;
   content: string;
@@ -6,12 +9,12 @@ export class Posts {
   createdAt: Date;
   updatedAt: Date;
 
-  constructor(partial: Posts) {
+  constructor(partial: Post) {
     Object.assign(this, partial);
   }
 
-  static fromPlain(plain: Partial<Posts>): Posts {
-    return new Posts({
+  static fromPlain(plain: Partial<Post>): Post {
+    return new Post({
       createdAt: new Date(),
       updatedAt: new Date(),
       postId: '',
