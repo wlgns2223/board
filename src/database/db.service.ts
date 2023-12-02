@@ -12,9 +12,7 @@ export class DBService {
   }
 
   private toValues(obj: any) {
-    return `( ${Object.values(obj)
-      .map((value) => `"${value}"`)
-      .join(',')} )`;
+    return Object.values(obj);
   }
 
   private toPlaceholders(obj: any) {
@@ -30,9 +28,11 @@ export class DBService {
   }
 
   helpInsert(obj: any) {
-    const columns = this.toColumns(obj);
-    const values = this.toValues(obj);
-    const placesholders = this.toPlaceholders(obj);
+    const snakeCaseObj = this.toSnakeCase(obj);
+
+    const columns = this.toColumns(snakeCaseObj);
+    const values = this.toValues(snakeCaseObj);
+    const placesholders = this.toPlaceholders(snakeCaseObj);
 
     return {
       columns,
@@ -53,8 +53,40 @@ export class DBService {
   }
 
   /**
+   * 학습 및 실험적 코딩
+   */
+  private toSnakeCase(param: any): any;
+  private toSnakeCase(param: any[]): any {
+    if (typeof param === 'object') {
+      const snakeCaseObj = {};
+      for (const key in param) {
+        const snakeCaseKey = key.replace(
+          /[A-Z]/g,
+          (letter) => `_${letter.toLowerCase()}`,
+        );
+        snakeCaseObj[snakeCaseKey] = param[key];
+      }
+      return snakeCaseObj;
+    }
+
+    if (typeof param === 'string') {
+      return (param as string).replace(
+        /[A-Z]/g,
+        (letter) => `_${letter.toLowerCase()}`,
+      );
+    }
+  }
+
+  /**
    *  Row가 배열임
    */
+
+  async getLastInsertedRow(tableName: string) {
+    const sql = `SELECT * FROM ${tableName} WHERE id = LAST_INSERT_ID()`;
+    const result = await this.query(sql);
+    return result[0];
+  }
+
   async query(sql: string, values?: any): Promise<any> {
     const conn = await this.pool.getConnection();
 
@@ -64,6 +96,7 @@ export class DBService {
       return rows;
     } catch (error) {
       this.logger.error('Query: ' + sql);
+      this.logger.error('Values: ' + values);
       this.logger.error(error);
       throw new Error(error);
     } finally {

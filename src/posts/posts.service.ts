@@ -12,7 +12,9 @@ export class PostsService {
 
   async createPost(createPostDto: CreatePostDto) {
     const { authorId } = createPostDto;
+
     const user = await this.usersService.getUserById(authorId);
+
     if (!user) {
       throw new BadRequestException('User not found');
     }

@@ -1,8 +1,8 @@
 export interface PostAttrs
-  extends Omit<Post, 'postId' | 'createdAt' | 'updatedAt'> {}
+  extends Omit<Post, 'id' | 'createdAt' | 'updatedAt'> {}
 
 export class Post {
-  postId: string;
+  id: string;
   title: string;
   content: string;
   authorId: string;
@@ -17,7 +17,7 @@ export class Post {
     return new Post({
       createdAt: new Date(),
       updatedAt: new Date(),
-      postId: '',
+      id: '',
       title: '',
       content: '',
       authorId: '',

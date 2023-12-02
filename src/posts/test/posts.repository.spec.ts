@@ -9,7 +9,7 @@ describe('PostsRepository', () => {
   const queryMock = jest.fn();
   const helpInsertMock = jest.fn();
   const fakePost: Post = {
-    postId: '1',
+    id: '1',
     title: 'title',
     content: 'content',
     authorId: '1',
@@ -37,12 +37,12 @@ describe('PostsRepository', () => {
   });
 
   it('should get a post by postId', async () => {
-    const sql = `SELECT * FROM posts WHERE postId = ?`;
+    const sql = `SELECT * FROM posts WHERE id = ? JOIN users ON posts.authorId = users.id`;
     queryMock.mockResolvedValue([fakePost]);
 
-    const result = await postsRepository.getPostById(fakePost.postId);
+    const result = await postsRepository.getPostById(fakePost.id);
     expect(result).toEqual(fakePost);
-    expect(queryMock).toHaveBeenCalledWith(sql, [fakePost.postId]);
+    expect(queryMock).toHaveBeenCalledWith(sql, [fakePost.id]);
   });
 
   it('should create a post', async () => {
