@@ -2,11 +2,19 @@ import { Injectable, Logger } from '@nestjs/common';
 import { DBService } from '../database/db.service';
 import { User } from './user.model';
 import { CreateUserDto } from './dto/create.dto';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class UsersRepository {
   private logger = new Logger(UsersRepository.name);
   constructor(private conn: DBService) {}
+
+  async getUserById(id: string) {
+    const sql = `SELECT * FROM users WHERE id = ?`;
+    const result = await this.conn.query(sql, [id]);
+
+    return plainToClass(User, result[0]);
+  }
 
   async getUserByEmail(email: string) {
     const userKeys = Object.keys(User.fromPlain({}))
@@ -40,10 +48,7 @@ export class UsersRepository {
   async updateUser(email: string, attrs: Partial<User>) {
     let result: User | undefined = undefined;
     try {
-      const update = Object.entries(attrs)
-        .map(([key, value]) => `${key} = "${value}"`)
-        .join(', ');
-
+      const update = this.conn.helpUpdate(attrs);
       const sql = `UPDATE users SET ${update} WHERE email = "${email}"`;
 
       await this.conn.query(sql, [email]);

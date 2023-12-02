@@ -1,12 +1,20 @@
+import { Exclude } from 'class-transformer';
+
 export interface UserAttrs
   extends Omit<User, 'id' | 'createdAt' | 'updatedAt'> {}
 
 export class User {
   id: string;
+
   email: string;
+
   nickname: string;
+
+  @Exclude()
   password: string;
+
   createdAt: Date;
+
   updatedAt: Date;
 
   constructor(partial: User) {

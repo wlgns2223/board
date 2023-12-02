@@ -4,10 +4,12 @@ import { UsersRepository } from '../users.repository';
 import * as bcrypt from 'bcrypt';
 import { BadRequestException } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create.dto';
+import { User } from '../user.model';
 
 const getUserByEmailMock = jest.fn();
 const createUserMock = jest.fn();
 const updateUserMock = jest.fn();
+const getUserByIdMock = jest.fn();
 
 describe('UsersService', () => {
   let usersService: UsersService;
@@ -27,12 +29,17 @@ describe('UsersService', () => {
             getUserByEmail: getUserByEmailMock,
             createUser: createUserMock,
             updateUser: updateUserMock,
-          },
+            getUserById: getUserByIdMock,
+          } as Partial<UsersRepository>,
         },
       ],
     }).compile();
     usersService = module.get<UsersService>(UsersService);
     usersRepository = module.get<UsersRepository>(UsersRepository);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -104,5 +111,18 @@ describe('UsersService', () => {
     await expect(
       usersService.updateUser(fakeUserCreateDto.email, expected),
     ).rejects.toThrow('User does not exist');
+  });
+
+  it('should get a user by id ', async () => {
+    const id = '1234';
+    const user = User.fromPlain({
+      id,
+    });
+    getUserByIdMock.mockResolvedValue(user);
+
+    const result = await usersService.getUserById(id);
+
+    expect(result).toEqual(user);
+    expect(getUserByIdMock).toHaveBeenCalledWith(id);
   });
 });

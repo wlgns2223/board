@@ -6,6 +6,7 @@ import { UpdateUserDto } from '../dto/update.dto';
 import { User } from '../user.model';
 
 const query = jest.fn();
+const helpUpdateMock = jest.fn();
 
 describe('UsersRepository', () => {
   let usersRepository: UsersRepository;
@@ -17,11 +18,16 @@ describe('UsersRepository', () => {
           provide: DBService,
           useValue: {
             query,
-          },
+            helpUpdate: helpUpdateMock,
+          } as Partial<DBService>,
         },
       ],
     }).compile();
     usersRepository = module.get<UsersRepository>(UsersRepository);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   const fakeUser = {
@@ -85,12 +91,34 @@ describe('UsersRepository', () => {
     const columns = Object.entries(updateDto)
       .map(([key, value]) => `${key} = ${value}`)
       .join(', ');
-    const sql = `UPDATE users SET ${columns} WHERE email = ${fakeUser.email}`;
+    const sql = `UPDATE users SET ${columns} WHERE email = "${fakeUser.email}"`;
     query.mockResolvedValue([expected]);
+    helpUpdateMock.mockReturnValue(columns);
 
     const result = await usersRepository.updateUser(fakeUser.email, updateDto);
 
     expect(query).toHaveBeenCalledWith(sql, [fakeUser.email]);
+    expect(result).toEqual(expected);
+  });
+
+  it('should get a user by id', async () => {
+    const id = '1234';
+    const fakeUser = User.fromPlain({
+      email: 'email@gmail.com',
+      password: 'password',
+      id,
+      nickname: 'nickname',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    const sql = `SELECT * FROM users WHERE id = ?`;
+    const expected = { ...fakeUser };
+    delete expected.password;
+    query.mockResolvedValue([fakeUser]);
+
+    const result = await usersRepository.getUserById(id);
+
+    expect(query).toHaveBeenCalledWith(sql, [id]);
     expect(result).toEqual(expected);
   });
 });

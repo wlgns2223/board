@@ -23,6 +23,12 @@ export class DBService {
       .join(',')} )`;
   }
 
+  helpUpdate(obj: any) {
+    return Object.keys(obj)
+      .map((key) => `${key} = "${obj[key]}"`)
+      .join(',');
+  }
+
   helpInsert(obj: any) {
     const columns = this.toColumns(obj);
     const values = this.toValues(obj);
@@ -54,7 +60,8 @@ export class DBService {
 
     try {
       const [rows, fields] = await conn.query(sql, values);
-      return;
+
+      return rows;
     } catch (error) {
       this.logger.error('Query: ' + sql);
       this.logger.error(error);

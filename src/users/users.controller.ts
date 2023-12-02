@@ -21,4 +21,9 @@ export class UsersController {
   async updateUser(@Param('email') email: string, @Body() dto: UpdateUserDto) {
     return this.usersService.updateUser(email, dto);
   }
+
+  @Get(':id')
+  async getUserById(@Param('id') id: string) {
+    return this.usersService.getUserById(id);
+  }
 }
