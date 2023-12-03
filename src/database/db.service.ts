@@ -81,12 +81,6 @@ export class DBService {
    *  Row가 배열임
    */
 
-  async getLastInsertedRow(tableName: string) {
-    const sql = `SELECT * FROM ${tableName} WHERE id = LAST_INSERT_ID()`;
-    const result = await this.query(sql);
-    return result[0];
-  }
-
   async query(sql: string, values?: any): Promise<any> {
     const conn = await this.pool.getConnection();
 

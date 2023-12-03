@@ -67,4 +67,6 @@ describe('PostsRepository', () => {
       dto.content,
     ]);
   });
+
+  it.todo('test lastInsertedRow on createPost');
 });
