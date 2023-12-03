@@ -21,6 +21,17 @@ export class DBService {
     return this.queryHelper.toPlaceholders();
   }
 
+  constructor(configService: ConfigService) {
+    this.pool = mysql.createPool({
+      host: configService.get<string>('DB_HOST'),
+      user: configService.get<string>('DB_USERNAME'),
+      password: configService.get<string>('DB_PASSWORD'),
+      database: configService.get<string>('DB_NAME'),
+      waitForConnections: true,
+      connectionLimit: 10,
+    });
+  }
+
   helpUpdate(obj: any) {
     return Object.keys(obj)
       .map((key) => `${key} = "${obj[key]}"`)
@@ -40,17 +51,6 @@ export class DBService {
       values,
       placesholders,
     };
-  }
-
-  constructor(configService: ConfigService) {
-    this.pool = mysql.createPool({
-      host: configService.get<string>('DB_HOST'),
-      user: configService.get<string>('DB_USERNAME'),
-      password: configService.get<string>('DB_PASSWORD'),
-      database: configService.get<string>('DB_NAME'),
-      waitForConnections: true,
-      connectionLimit: 10,
-    });
   }
 
   /**

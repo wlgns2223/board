@@ -21,4 +21,8 @@ export class PostsService {
 
     return this.postRepository.createPost(createPostDto);
   }
+
+  async getPostById(postId: string) {
+    return this.postRepository.getPostById(postId);
+  }
 }

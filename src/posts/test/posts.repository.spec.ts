@@ -44,7 +44,8 @@ describe('PostsRepository', () => {
   });
 
   it('should get a post by postId', async () => {
-    const sql = `SELECT * FROM posts WHERE id = ? JOIN users ON posts.authorId = users.id`;
+    const sql = `SELECT P.id AS postId, title, content, P.createdAt, P.updatedAt, U.id AS userId, email, nickname  
+    FROM posts AS P JOIN users AS U ON P.author_id = U.id WHERE P.id = "${fakePost.id}"`;
     queryMock.mockResolvedValue([fakePost]);
 
     const result = await postsRepository.getPostById(fakePost.id);

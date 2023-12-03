@@ -32,7 +32,8 @@ export class PostsRepository {
   }
 
   async getPostById(postId: string) {
-    const sql = `SELECT * FROM posts WHERE id = ? JOIN users ON posts.authorId = users.id`;
+    const sql = `SELECT P.id AS postId, title, content, P.createdAt, P.updatedAt, U.id AS userId, email, nickname  
+    FROM posts AS P JOIN users AS U ON P.author_id = U.id WHERE P.id = "${postId}"`;
     const result = await this.db.query(sql, [postId]);
     return Array.isArray(result) ? result[0] : result;
   }
