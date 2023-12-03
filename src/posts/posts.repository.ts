@@ -22,7 +22,7 @@ export class PostsRepository {
     let result: Post | undefined = undefined;
     try {
       await this.db.query(sql, values);
-      const refetch = await this.db.query(refetchSql);
+      const refetch = await this.db.getLastInsertedRow(refetchSql);
       result = refetch[0];
     } catch (error) {
       this.logger.error(error);

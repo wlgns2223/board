@@ -1,24 +1,24 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as mysql from 'mysql2/promise';
+import { QueryHelper } from '../common/utils/queryHelper';
 
 @Injectable()
 export class DBService {
   private pool: mysql.Pool;
   private logger = new Logger(DBService.name);
+  private queryHelper: QueryHelper = new QueryHelper();
 
-  private toColumns(obj: any) {
-    return `( ${Object.keys(obj).join(',')} )`;
+  private toColumns() {
+    return this.queryHelper.toColumns();
   }
 
-  private toValues(obj: any) {
-    return Object.values(obj);
+  private toValues() {
+    return this.queryHelper.toValues();
   }
 
-  private toPlaceholders(obj: any) {
-    return `( ${Object.values(obj)
-      .map((value) => '?')
-      .join(',')} )`;
+  private toPlaceholders() {
+    return this.queryHelper.toPlaceholders();
   }
 
   helpUpdate(obj: any) {
@@ -29,10 +29,11 @@ export class DBService {
 
   helpInsert(obj: any) {
     const snakeCaseObj = this.toSnakeCase(obj);
+    this.queryHelper.setObj(snakeCaseObj);
 
-    const columns = this.toColumns(snakeCaseObj);
-    const values = this.toValues(snakeCaseObj);
-    const placesholders = this.toPlaceholders(snakeCaseObj);
+    const columns = this.toColumns();
+    const values = this.toValues();
+    const placesholders = this.toPlaceholders();
 
     return {
       columns,
@@ -80,6 +81,11 @@ export class DBService {
   /**
    *  Row가 배열임
    */
+
+  async getLastInsertedRow(sql: string) {
+    const result = await this.query(sql);
+    return result[0];
+  }
 
   async query(sql: string, values?: any): Promise<any> {
     const conn = await this.pool.getConnection();
