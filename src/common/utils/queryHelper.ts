@@ -18,4 +18,10 @@ export class QueryHelper {
       .map((value) => '?')
       .join(',')})`;
   };
+
+  toUpdate() {
+    return Object.keys(this.obj)
+      .map((key) => `${key} = "${this.obj[key]}"`)
+      .join(',');
+  }
 }

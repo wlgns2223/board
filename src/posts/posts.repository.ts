@@ -22,8 +22,7 @@ export class PostsRepository {
     let result: Post | undefined = undefined;
     try {
       await this.db.query(sql, values);
-      const refetch = await this.db.getLastInsertedRow(refetchSql);
-      result = refetch[0];
+      result = await this.db.getLastInsertedRow(refetchSql);
     } catch (error) {
       this.logger.error(error);
     } finally {
@@ -36,5 +35,21 @@ export class PostsRepository {
     FROM posts AS P JOIN users AS U ON P.author_id = U.id WHERE P.id = "${postId}"`;
     const result = await this.db.query(sql, [postId]);
     return Array.isArray(result) ? result[0] : result;
+  }
+
+  async updatePostById(postId: string, attrs: Partial<Post>) {
+    let result: Post | undefined = undefined;
+    try {
+      const update = this.db.helpUpdate(attrs);
+      const sql = `UPDATE posts SET ${update} WHERE id = "${postId}"`;
+
+      await this.db.query(sql, [postId]);
+
+      result = await this.getPostById(postId);
+    } catch (error) {
+      this.logger.error(error);
+    } finally {
+      return result;
+    }
   }
 }

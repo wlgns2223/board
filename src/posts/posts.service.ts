@@ -19,10 +19,14 @@ export class PostsService {
       throw new BadRequestException('User not found');
     }
 
-    return this.postRepository.createPost(createPostDto);
+    return await this.postRepository.createPost(createPostDto);
   }
 
   async getPostById(postId: string) {
-    return this.postRepository.getPostById(postId);
+    return await this.postRepository.getPostById(postId);
+  }
+
+  async updatePostById(postId: string, attrs: Partial<CreatePostDto>) {
+    return await this.postRepository.updatePostById(postId, attrs);
   }
 }

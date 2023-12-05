@@ -33,9 +33,9 @@ export class DBService {
   }
 
   helpUpdate(obj: any) {
-    return Object.keys(obj)
-      .map((key) => `${key} = "${obj[key]}"`)
-      .join(',');
+    const snakeCaseObj = this.toSnakeCase(obj);
+    this.queryHelper.setObj(snakeCaseObj);
+    return this.queryHelper.toUpdate();
   }
 
   helpInsert(obj: any) {
@@ -84,6 +84,7 @@ export class DBService {
 
   async getLastInsertedRow(sql: string) {
     const result = await this.query(sql);
+
     return result[0];
   }
 
