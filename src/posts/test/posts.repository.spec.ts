@@ -10,6 +10,7 @@ describe('PostsRepository', () => {
   const queryMock = jest.fn();
   const helpInsertMock = jest.fn();
   const getLastInsertedRowMock = jest.fn();
+  const helpUpdateMock = jest.fn();
   const fakePost: Post = {
     id: '1',
     title: 'title',
@@ -27,8 +28,9 @@ describe('PostsRepository', () => {
           useValue: {
             query: queryMock,
             helpInsert: helpInsertMock,
+            helpUpdate: helpUpdateMock,
             getLastInsertedRow: getLastInsertedRowMock,
-          },
+          } as Partial<DBService>,
         },
       ],
     }).compile();
@@ -60,13 +62,14 @@ describe('PostsRepository', () => {
       content: 'fakeContent',
     };
     const sql = `INSERT INTO posts (id, authorId, title, content) VALUES (?, ?, ?, ?)`;
-    queryMock.mockResolvedValue([fakePost]);
+    queryMock.mockResolvedValue(fakePost);
+
     helpInsertMock.mockReturnValue({
       columns: '(id, authorId, title, content)',
       values: ['1', 'fakeAuthorId', 'fakeTitle', 'fakeContent'],
       placesholders: '(?, ?, ?, ?)',
     });
-    getLastInsertedRowMock.mockResolvedValue([fakePost]);
+    getLastInsertedRowMock.mockResolvedValue(fakePost);
 
     const result = await postsRepository.createPost(dto);
 
@@ -94,5 +97,42 @@ describe('PostsRepository', () => {
     expect(column).toEqual('(id,title,content)');
     expect(value).toEqual(['1234', 'title', 'content']);
     expect(placeholder).toEqual('(?,?,?)');
+  });
+
+  it("should create update string from object's key and value", () => {
+    const obj = {
+      title: 'title',
+      content: 'content',
+    };
+    const queryHelper = new QueryHelper(obj);
+    const expected = `title = "title",content = "content"`;
+
+    const update = queryHelper.toUpdate();
+
+    expect(update).toEqual(expected);
+  });
+
+  it('should update a post by postId', async () => {
+    const postId = 'fakePostId';
+    const attrs = {
+      title: 'fakeTitle',
+      content: 'fakeContent',
+    };
+    const queryHelper = new QueryHelper(attrs);
+    const update = queryHelper.toUpdate();
+    const sql = `UPDATE posts SET ${update} WHERE id = "${postId}"`;
+
+    const expected = {
+      ...fakePost,
+      ...attrs,
+    };
+    queryMock.mockResolvedValue(fakePost);
+    helpUpdateMock.mockReturnValue(update);
+    jest.spyOn(postsRepository, 'getPostById').mockResolvedValue(expected);
+
+    const result = await postsRepository.updatePostById(postId, attrs);
+
+    expect(result).toEqual(expected);
+    expect(queryMock).toHaveBeenCalledWith(sql, [postId]);
   });
 });

@@ -1,6 +1,15 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/createPost.dto';
+import { UpdatePostDto } from './dto/updatePost.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -17,10 +26,13 @@ export class PostsController {
   }
 
   @Put(':id')
-  async updatePostById(
-    @Param('id') id: string,
-    @Body() attrs: Partial<CreatePostDto>,
-  ) {
+  async updatePostById(@Param('id') id: string, @Body() attrs: UpdatePostDto) {
+    console.log(attrs);
     return await this.postsService.updatePostById(id, attrs);
+  }
+
+  @Delete(':id')
+  async deletePostById(@Param('id') id: string) {
+    return await this.postsService.deletePostById(id);
   }
 }

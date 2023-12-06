@@ -3,6 +3,7 @@ import { DBService } from '../database/db.service';
 import { CreatePostDto } from './dto/createPost.dto';
 import { Post } from './posts.model';
 import { v4 as uuid } from 'uuid';
+import { UpdatePostDto } from './dto/updatePost.dto';
 
 @Injectable()
 export class PostsRepository {
@@ -37,15 +38,29 @@ export class PostsRepository {
     return Array.isArray(result) ? result[0] : result;
   }
 
-  async updatePostById(postId: string, attrs: Partial<Post>) {
+  async updatePostById(postId: string, attrs: UpdatePostDto) {
     let result: Post | undefined = undefined;
     try {
       const update = this.db.helpUpdate(attrs);
+
       const sql = `UPDATE posts SET ${update} WHERE id = "${postId}"`;
 
       await this.db.query(sql, [postId]);
 
       result = await this.getPostById(postId);
+    } catch (error) {
+      this.logger.error(error);
+    } finally {
+      return result;
+    }
+  }
+
+  async deletePostById(postId: string) {
+    const sql = `DELETE FROM posts WHERE id = "${postId}"`;
+    let result = false;
+    try {
+      await this.db.query(sql, [postId]);
+      result = true;
     } catch (error) {
       this.logger.error(error);
     } finally {

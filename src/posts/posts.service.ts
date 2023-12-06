@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PostsRepository } from './posts.repository';
 import { CreatePostDto } from './dto/createPost.dto';
 import { UsersService } from '../users/users.service';
+import { UpdatePostDto } from './dto/updatePost.dto';
 
 @Injectable()
 export class PostsService {
@@ -26,7 +27,11 @@ export class PostsService {
     return await this.postRepository.getPostById(postId);
   }
 
-  async updatePostById(postId: string, attrs: Partial<CreatePostDto>) {
+  async updatePostById(postId: string, attrs: UpdatePostDto) {
     return await this.postRepository.updatePostById(postId, attrs);
+  }
+
+  async deletePostById(postId: string) {
+    return await this.postRepository.deletePostById(postId);
   }
 }
