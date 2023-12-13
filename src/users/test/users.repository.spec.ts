@@ -39,6 +39,29 @@ describe('UsersRepository', () => {
     expect(usersRepository).toBeDefined();
   });
 
+  it("should delete a user by it's email", async () => {
+    query.mockResolvedValue(true);
+    const fakeEmail = 'test@gmail.com';
+    const sql = `DELETE FROM users WHERE email = ?`;
+
+    const result = await usersRepository.deleteUserByEmail(fakeEmail);
+
+    expect(query).toHaveBeenCalledWith(sql, [fakeEmail]);
+    expect(result).toEqual(true);
+  });
+
+  it("should throw an error if it can't delete a user by it's email", async () => {
+    query.mockRejectedValue(new Error("Can't delete user"));
+    const fakeEmail = 'test@gmail.com';
+    const sql = `DELETE FROM users WHERE email = ?`;
+    jest.spyOn(usersRepository['logger'], 'error').mockImplementation(() => {});
+
+    await expect(usersRepository.deleteUserByEmail(fakeEmail)).rejects.toThrow(
+      new Error("Can't delete user"),
+    );
+    expect(query).toHaveBeenCalledWith(sql, [fakeEmail]);
+  });
+
   it('should return user by email', async () => {
     //Arange
     query.mockResolvedValue([fakeUser]);

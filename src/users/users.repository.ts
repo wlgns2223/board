@@ -60,4 +60,15 @@ export class UsersRepository {
       return result;
     }
   }
+
+  async deleteUserByEmail(email: string) {
+    const sql = `DELETE FROM users WHERE email = ?`;
+    try {
+      await this.conn.query(sql, [email]);
+      return true;
+    } catch (error) {
+      this.logger.error(error);
+      throw new Error("Can't delete user");
+    }
+  }
 }

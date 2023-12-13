@@ -10,6 +10,7 @@ const getUserByEmailMock = jest.fn();
 const createUserMock = jest.fn();
 const updateUserMock = jest.fn();
 const getUserByIdMock = jest.fn();
+const deleteUserByEmailMock = jest.fn();
 
 describe('UsersService', () => {
   let usersService: UsersService;
@@ -30,6 +31,7 @@ describe('UsersService', () => {
             createUser: createUserMock,
             updateUser: updateUserMock,
             getUserById: getUserByIdMock,
+            deleteUserByEmail: deleteUserByEmailMock,
           } as Partial<UsersRepository>,
         },
       ],
@@ -124,5 +126,45 @@ describe('UsersService', () => {
 
     expect(result).toEqual(user);
     expect(getUserByIdMock).toHaveBeenCalledWith(id);
+  });
+
+  it('should delete a user by email', async () => {
+    const email = 'test@gmail.com';
+    const user = User.fromPlain({
+      email,
+    });
+    getUserByEmailMock.mockResolvedValue(user);
+    deleteUserByEmailMock.mockResolvedValue(true);
+
+    const result = await usersService.deleteUserByEmail(email);
+
+    expect(result).toEqual(true);
+    expect(getUserByEmailMock).toHaveBeenCalledWith(email);
+    expect(deleteUserByEmailMock).toHaveBeenCalledWith(email);
+  });
+
+  it("should throw an error when user doesn't exist on delete", async () => {
+    const email = 'test@gmail';
+    getUserByEmailMock.mockResolvedValue(undefined);
+
+    await expect(usersService.deleteUserByEmail(email)).rejects.toThrow(
+      BadRequestException,
+    );
+    await expect(usersService.deleteUserByEmail(email)).rejects.toThrow(
+      'User does not exist',
+    );
+  });
+
+  it("should throw an error when repository layer can't delete a user", async () => {
+    const email = 'test@gmail.com';
+    const user = User.fromPlain({
+      email,
+    });
+    getUserByEmailMock.mockResolvedValue(user);
+    deleteUserByEmailMock.mockRejectedValue(new Error("Can't delete user"));
+
+    await expect(usersService.deleteUserByEmail(email)).rejects.toThrow(
+      new Error("Can't delete user"),
+    );
   });
 });

@@ -39,4 +39,13 @@ export class UsersService {
 
     return await this.userRepository.updateUser(email, updateUserDto);
   }
+
+  async deleteUserByEmail(email: string) {
+    const user = await this.userRepository.getUserByEmail(email);
+    if (!user) {
+      throw new BadRequestException('User does not exist');
+    }
+
+    return await this.userRepository.deleteUserByEmail(email);
+  }
 }

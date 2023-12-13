@@ -56,15 +56,13 @@ export class PostsRepository {
   }
 
   async deletePostById(postId: string) {
-    const sql = `DELETE FROM posts WHERE id = "${postId}"`;
-    let result = false;
+    const sql = `DELETE FROM posts WHERE id = ?`;
     try {
       await this.db.query(sql, [postId]);
-      result = true;
+      return true;
     } catch (error) {
       this.logger.error(error);
-    } finally {
-      return result;
+      throw new Error("Couldn't delete post");
     }
   }
 }

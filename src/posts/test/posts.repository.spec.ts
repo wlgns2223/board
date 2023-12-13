@@ -135,4 +135,28 @@ describe('PostsRepository', () => {
     expect(result).toEqual(expected);
     expect(queryMock).toHaveBeenCalledWith(sql, [postId]);
   });
+
+  it('should delete a post by postId', async () => {
+    const postId = 'fakePostId';
+    const sql = `DELETE FROM posts WHERE id = ?`;
+    queryMock.mockResolvedValue(true);
+
+    const result = await postsRepository.deletePostById(postId);
+
+    expect(result).toEqual(true);
+    expect(queryMock).toHaveBeenCalledWith(sql, [postId]);
+  });
+
+  it("should throw error when can't delete a post by postId", async () => {
+    const postId = 'fakePostId';
+    const sql = `DELETE FROM posts WHERE id = ?`;
+    queryMock.mockRejectedValue(new Error('error'));
+    // turn off error log
+    jest.spyOn(postsRepository['logger'], 'error').mockImplementation(() => {});
+
+    await expect(postsRepository.deletePostById(postId)).rejects.toThrow(
+      new Error("Couldn't delete post"),
+    );
+    expect(queryMock).toHaveBeenCalledWith(sql, [postId]);
+  });
 });
