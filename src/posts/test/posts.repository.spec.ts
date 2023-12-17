@@ -159,4 +159,30 @@ describe('PostsRepository', () => {
     );
     expect(queryMock).toHaveBeenCalledWith(sql, [postId]);
   });
+
+  it('should show a paginated posts result', async () => {
+    const page = 1;
+    const limit = 20;
+    const sql = `SELECT * FROM posts ORDER BY createdAt DESC LIMIT 20 OFFSET ?`;
+    const fakePosts = Array.from({ length: limit }).map(() => fakePost);
+    queryMock.mockResolvedValue(fakePosts);
+
+    const result = await postsRepository.getPosts(page);
+
+    expect(result).toHaveLength(limit);
+    expect(result).toEqual(result);
+    expect(queryMock).toHaveBeenCalledWith(sql, [page - 1]);
+  });
+
+  it('should throw an error if pagination query fails', async () => {
+    jest.spyOn(postsRepository['logger'], 'error').mockImplementation(() => {});
+    queryMock.mockRejectedValue(new Error("Coun't paginate posts"));
+    const sql = `SELECT * FROM posts ORDER BY createdAt DESC LIMIT 20 OFFSET ?`;
+    const page = 1;
+
+    await expect(postsRepository.getPosts(page)).rejects.toThrow(
+      new Error("Coun't paginate posts"),
+    );
+    expect(queryMock).toHaveBeenCalledWith(sql, [page - 1]);
+  });
 });

@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/createPost.dto';
@@ -23,6 +24,11 @@ export class PostsController {
   @Get(':id')
   async getPostById(@Param('id') id: string) {
     return await this.postsService.getPostById(id);
+  }
+
+  @Get()
+  async getPosts(@Query('page') page: number) {
+    return await this.postsService.getPosts(page);
   }
 
   @Put(':id')

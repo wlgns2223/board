@@ -65,4 +65,16 @@ export class PostsRepository {
       throw new Error("Couldn't delete post");
     }
   }
+
+  async getPosts(page: number) {
+    const sql = `SELECT * FROM posts ORDER BY createdAt DESC LIMIT 20 OFFSET ?`;
+    try {
+      const result = await this.db.query(sql, [page - 1]);
+
+      return result;
+    } catch (error) {
+      this.logger.error(error);
+      throw new Error("Coun't paginate posts");
+    }
+  }
 }

@@ -1,7 +1,8 @@
 import * as mysql from 'mysql2/promise';
-import { CreatePostDto } from './src/posts/dto/createPost.dto';
 import { CreateUserDto } from './src/users/dto/create.dto';
 import { faker } from '@faker-js/faker';
+import { Post } from './src/posts/posts.model';
+import * as dayjs from 'dayjs';
 
 const host = process.env.DB_HOST;
 const user = process.env.DB_USERNAME;
@@ -22,12 +23,15 @@ const seedPost = async () => {
   const usersSql = 'SELECT id FROM users';
   const [row, _] = await conn.query(usersSql);
   const userIds = (row as { id: string }[]).map((i) => i.id);
-  const sql = 'INSERT INTO posts (author_id, content,title) VALUES (? ,? ,?)';
+  const sql =
+    'INSERT INTO posts (author_id, content,title,createdAt) VALUES (? ,? ,?,?)';
 
   console.log('start...');
+  const from = dayjs('2023-01-01').toDate();
+  const to = dayjs('2023-12-31').toDate();
   Array.from({ length: 100 }).forEach(async () => {
     const idx = Math.floor(Math.random() * userIds.length);
-    const dto: CreatePostDto = {
+    const dto: Partial<Post> = {
       authorId: userIds[idx],
       content: faker.lorem.paragraph({ min: 1, max: 2 }),
       title: faker.lorem.word({
@@ -35,6 +39,10 @@ const seedPost = async () => {
           min: 3,
           max: 40,
         },
+      }),
+      createdAt: faker.date.between({
+        from,
+        to,
       }),
     };
 
@@ -67,3 +75,5 @@ const seedUsers = async () => {
   });
   console.log('end...');
 };
+
+seedPost();

@@ -34,4 +34,8 @@ export class PostsService {
   async deletePostById(postId: string) {
     return await this.postRepository.deletePostById(postId);
   }
+
+  async getPosts(page: number) {
+    return await this.postRepository.getPosts(page);
+  }
 }
