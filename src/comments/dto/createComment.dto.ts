@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { CommentAttr } from '../comment.model';
+import { Comment, CommentEntity } from '../comment.entity';
 
-export class CreateCommentDto implements CommentAttr {
+export class CreateCommentDto implements Comment {
   @IsString()
   @IsNotEmpty()
   content: string;
@@ -17,4 +17,13 @@ export class CreateCommentDto implements CommentAttr {
   @IsString()
   @IsOptional()
   parentId: string;
+
+  toEntity() {
+    return new CommentEntity({
+      content: this.content,
+      parentId: this.parentId,
+      postId: this.postId,
+      userId: this.userId,
+    });
+  }
 }
