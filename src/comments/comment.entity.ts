@@ -1,29 +1,42 @@
-export interface BaseEntityInterface {
+export abstract class BaseEntityInterface {
   id: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface Comment {
+export class CommentEntity extends BaseEntityInterface {
   content: string;
   userId: string;
   postId: string;
   parentId: string | null;
-}
-
-export class CommentEntity implements Comment, BaseEntityInterface {
-  createdAt: Date;
-  id: string;
-  updatedAt: Date;
-  content: string;
-  userId: string;
-  postId: string;
-  parentId: string | null;
-
-  constructor(comment: Comment) {
-    this.content = comment.content;
-    this.userId = comment.userId;
-    this.postId = comment.postId;
-    this.parentId = comment.parentId;
+  constructor(params: {
+    content: string;
+    userId: string;
+    postId: string;
+    parentId: string | null;
+  }) {
+    super();
+    this.content = params.content;
+    this.userId = params.userId;
+    this.postId = params.postId;
+    this.parentId = params.parentId;
   }
+
+  // TypeORM 안써서, 필요없는 테크닉임
+
+  // static from(fields: {
+  //   content: string;
+  //   userId: string;
+  //   postId: string;
+  //   parentId: string | null;
+  // }) {
+  //   const comment = new CommentEntity(
+  //     fields.content,
+  //     fields.userId,
+  //     fields.postId,
+  //     fields.parentId,
+  //   );
+
+  //   return comment;
+  // }
 }

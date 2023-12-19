@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DBService } from '../database/db.service';
-import { Comment } from './comment.entity';
 
 @Injectable()
 export class CommentRepository {
@@ -12,7 +11,5 @@ export class CommentRepository {
 
 /**
  * Repository layer vs DAO
- *
- * Service layer vs DO
- *
+ * Service layer vs DO or Entity
  */
