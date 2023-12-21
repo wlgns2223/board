@@ -139,7 +139,7 @@ describe('UsersRepository', () => {
     delete expected.password;
     query.mockResolvedValue([fakeUser]);
 
-    const result = await usersRepository.getUserById(id);
+    const result = await usersRepository.findUserById(id);
 
     expect(query).toHaveBeenCalledWith(sql, [id]);
     expect(result).toEqual(expected);

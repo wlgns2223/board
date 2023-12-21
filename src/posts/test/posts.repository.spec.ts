@@ -50,7 +50,7 @@ describe('PostsRepository', () => {
     FROM posts AS P JOIN users AS U ON P.author_id = U.id WHERE P.id = "${fakePost.id}"`;
     queryMock.mockResolvedValue([fakePost]);
 
-    const result = await postsRepository.getPostById(fakePost.id);
+    const result = await postsRepository.findPostById(fakePost.id);
     expect(result).toEqual(fakePost);
     expect(queryMock).toHaveBeenCalledWith(sql, [fakePost.id]);
   });
@@ -128,7 +128,7 @@ describe('PostsRepository', () => {
     };
     queryMock.mockResolvedValue(fakePost);
     helpUpdateMock.mockReturnValue(update);
-    jest.spyOn(postsRepository, 'getPostById').mockResolvedValue(expected);
+    jest.spyOn(postsRepository, 'findPostById').mockResolvedValue(expected);
 
     const result = await postsRepository.updatePostById(postId, attrs);
 

@@ -8,8 +8,8 @@ import { UpdateUserDto } from './dto/update.dto';
 export class UsersService {
   constructor(private userRepository: UsersRepository) {}
 
-  async getUserById(id: string) {
-    return this.userRepository.getUserById(id);
+  async findUserById(id: string) {
+    return this.userRepository.findUserById(id);
   }
 
   async getUserByEmail(email: string) {

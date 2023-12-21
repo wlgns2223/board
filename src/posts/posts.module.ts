@@ -8,6 +8,6 @@ import { UsersModule } from '../users/users.module';
   imports: [UsersModule],
   controllers: [PostsController],
   providers: [PostsRepository, PostsService],
-  exports: [],
+  exports: [PostsService],
 })
 export class PostsModule {}

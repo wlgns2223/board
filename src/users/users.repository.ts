@@ -9,7 +9,7 @@ export class UsersRepository {
   private logger = new Logger(UsersRepository.name);
   constructor(private conn: DBService) {}
 
-  async getUserById(id: string) {
+  async findUserById(id: string) {
     const sql = `SELECT * FROM users WHERE id = ?`;
     const result = await this.conn.query(sql, [id]);
 

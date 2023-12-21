@@ -14,7 +14,7 @@ export class PostsService {
   async createPost(createPostDto: CreatePostDto) {
     const { authorId } = createPostDto;
 
-    const user = await this.usersService.getUserById(authorId);
+    const user = await this.usersService.findUserById(authorId);
 
     if (!user) {
       throw new BadRequestException('User not found');
@@ -23,8 +23,8 @@ export class PostsService {
     return await this.postRepository.createPost(createPostDto);
   }
 
-  async getPostById(postId: string) {
-    return await this.postRepository.getPostById(postId);
+  async findPostById(postId: string) {
+    return await this.postRepository.findPostById(postId);
   }
 
   async updatePostById(postId: string, attrs: UpdatePostDto) {

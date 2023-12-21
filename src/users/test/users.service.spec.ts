@@ -9,7 +9,7 @@ import { User } from '../user.model';
 const getUserByEmailMock = jest.fn();
 const createUserMock = jest.fn();
 const updateUserMock = jest.fn();
-const getUserByIdMock = jest.fn();
+const findUserByIdMock = jest.fn();
 const deleteUserByEmailMock = jest.fn();
 
 describe('UsersService', () => {
@@ -30,7 +30,7 @@ describe('UsersService', () => {
             getUserByEmail: getUserByEmailMock,
             createUser: createUserMock,
             updateUser: updateUserMock,
-            getUserById: getUserByIdMock,
+            findUserById: findUserByIdMock,
             deleteUserByEmail: deleteUserByEmailMock,
           } as Partial<UsersRepository>,
         },
@@ -120,12 +120,12 @@ describe('UsersService', () => {
     const user = User.fromPlain({
       id,
     });
-    getUserByIdMock.mockResolvedValue(user);
+    findUserByIdMock.mockResolvedValue(user);
 
-    const result = await usersService.getUserById(id);
+    const result = await usersService.findUserById(id);
 
     expect(result).toEqual(user);
-    expect(getUserByIdMock).toHaveBeenCalledWith(id);
+    expect(findUserByIdMock).toHaveBeenCalledWith(id);
   });
 
   it('should delete a user by email', async () => {

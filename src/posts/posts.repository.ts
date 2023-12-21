@@ -31,7 +31,7 @@ export class PostsRepository {
     }
   }
 
-  async getPostById(postId: string) {
+  async findPostById(postId: string) {
     const sql = `SELECT P.id AS postId, title, content, P.createdAt, P.updatedAt, U.id AS userId, email, nickname  
     FROM posts AS P JOIN users AS U ON P.author_id = U.id WHERE P.id = "${postId}"`;
     const result = await this.db.query(sql, [postId]);
@@ -47,7 +47,7 @@ export class PostsRepository {
 
       await this.db.query(sql, [postId]);
 
-      result = await this.getPostById(postId);
+      result = await this.findPostById(postId);
     } catch (error) {
       this.logger.error(error);
     } finally {

@@ -1,14 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DBService } from '../database/db.service';
 import { CreateCommentDto } from './dto/createComment.dto';
+import { CommentEntity } from './comment.entity';
 
 @Injectable()
 export class CommentRepository {
   private logger = new Logger(CommentRepository.name);
   constructor(private db: DBService) {}
 
-  async createComment(dto: CreateCommentDto) {
-    const { columns, placesholders, values } = this.db.helpInsert(dto);
+  async createComment(newComment: CommentEntity) {
+    const { columns, placesholders, values } = this.db.helpInsert(newComment);
     const sql = `INSERT INTO comments ${columns} VALUES ${placesholders}`;
 
     try {

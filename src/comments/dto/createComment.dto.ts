@@ -17,7 +17,7 @@ export class CreateCommentDto implements IDTO<CommentEntity> {
     content: string,
     userId: string,
     postId: string,
-    parentId: string,
+    parentId: string | null,
   ) {
     this._content = content;
     this._userId = userId;

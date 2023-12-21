@@ -22,8 +22,8 @@ export class PostsController {
   }
 
   @Get(':id')
-  async getPostById(@Param('id') id: string) {
-    return await this.postsService.getPostById(id);
+  async findPostById(@Param('id') id: string) {
+    return await this.postsService.findPostById(id);
   }
 
   @Get()

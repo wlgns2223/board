@@ -10,8 +10,8 @@ describe('PostsService', () => {
   let postsService: PostsService;
   let postsRepository: PostsRepository;
   let usersService: UsersService;
-  const getUserByIdMock = jest.fn();
-  const getPostByIdMock = jest.fn();
+  const findUserByIdMock = jest.fn();
+  const findPostByIdMock = jest.fn();
   const createPostMock = jest.fn();
 
   beforeEach(async () => {
@@ -21,14 +21,14 @@ describe('PostsService', () => {
         {
           provide: PostsRepository,
           useValue: {
-            getPostById: getPostByIdMock,
+            findPostById: findPostByIdMock,
             createPost: createPostMock,
           },
         },
         {
           provide: UsersService,
           useValue: {
-            getUserById: getUserByIdMock,
+            findUserById: findUserByIdMock,
           },
         },
       ],
@@ -70,12 +70,12 @@ describe('PostsService', () => {
       nickname: fakeUser.nickname,
     };
 
-    getUserByIdMock.mockResolvedValue(fakeUser);
+    findUserByIdMock.mockResolvedValue(fakeUser);
     createPostMock.mockResolvedValue(expected);
 
     const result = await postsService.createPost(dto);
 
-    expect(getUserByIdMock).toHaveBeenCalledWith(dto.authorId);
+    expect(findUserByIdMock).toHaveBeenCalledWith(dto.authorId);
     expect(createPostMock).toHaveBeenCalledWith(dto);
     expect(result).toEqual(expected);
   });
@@ -86,7 +86,7 @@ describe('PostsService', () => {
       title: 'fakeTitle',
       content: 'fakeContent',
     };
-    getUserByIdMock.mockResolvedValue(undefined);
+    findUserByIdMock.mockResolvedValue(undefined);
 
     await expect(postsService.createPost(dto)).rejects.toThrow(
       BadRequestException,
@@ -108,11 +108,11 @@ describe('PostsService', () => {
       email: 'fakeEmail',
       nickname: 'fakeNickname',
     };
-    getPostByIdMock.mockResolvedValue(expected);
+    findPostByIdMock.mockResolvedValue(expected);
 
-    const result = await postsService.getPostById(postId);
+    const result = await postsService.findPostById(postId);
 
-    expect(getPostByIdMock).toHaveBeenCalledWith(postId);
+    expect(findPostByIdMock).toHaveBeenCalledWith(postId);
     expect(result).toEqual(expected);
   });
 });

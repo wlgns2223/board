@@ -32,8 +32,8 @@ export class UsersController {
   }
 
   @Get(':id')
-  async getUserById(@Param('id') id: string) {
-    return this.usersService.getUserById(id);
+  async findUserById(@Param('id') id: string) {
+    return this.usersService.findUserById(id);
   }
 
   @Delete(':email')
