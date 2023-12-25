@@ -36,12 +36,12 @@ describe('CommentRepository', () => {
   });
 
   it('shuold create a comment', async () => {
-    const dto = new CreateCommentDto(
+    const dto = CreateCommentDto.of(
       'fakeContent',
       'fakeUserId',
       'fakePostId',
       null,
-    ).transform<CreateCommentDto>();
+    ).toEntity();
 
     const queryHelper = new QueryHelper(dto);
     const columns = queryHelper.toColumns();

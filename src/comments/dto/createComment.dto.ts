@@ -8,53 +8,40 @@ interface IDTO<T> {
 }
 
 export class CreateCommentDto implements IDTO<CommentEntity> {
-  @Exclude() private readonly _content: string;
-  @Exclude() private readonly _userId: string;
-  @Exclude() private readonly _postId: string;
-  @Exclude() private readonly _parentId: string | null;
+  constructor() {}
 
-  constructor(
+  @IsString()
+  @IsNotEmpty()
+  @Expose()
+  content: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Expose()
+  userId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Expose()
+  postId: string;
+
+  @IsString()
+  @IsOptional()
+  @Expose()
+  parentId: string | null;
+
+  static of(
     content: string,
     userId: string,
     postId: string,
     parentId: string | null,
   ) {
-    this._content = content;
-    this._userId = userId;
-    this._postId = postId;
-    this._parentId = parentId;
-  }
-
-  @IsString()
-  @IsNotEmpty()
-  @Expose()
-  get content(): string {
-    return this._content;
-  }
-
-  @IsString()
-  @IsNotEmpty()
-  @Expose()
-  get userId(): string {
-    return this._userId;
-  }
-
-  @IsString()
-  @IsNotEmpty()
-  @Expose()
-  get postId(): string {
-    return this._postId;
-  }
-
-  @IsString()
-  @IsOptional()
-  @Expose()
-  get parentId(): string {
-    return this._parentId;
-  }
-
-  transform<T>() {
-    return instanceToPlain(this) as T;
+    const dto = new CreateCommentDto();
+    dto.content = content;
+    dto.userId = userId;
+    dto.postId = postId;
+    dto.parentId = parentId;
+    return dto;
   }
 
   toEntity() {
