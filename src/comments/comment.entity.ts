@@ -2,6 +2,9 @@ export abstract class BaseEntityInterface {
   id: string;
   createdAt: Date;
   updatedAt: Date;
+  constructor(id: string) {
+    this.id = id;
+  }
 }
 
 export class CommentEntity extends BaseEntityInterface {
@@ -10,12 +13,13 @@ export class CommentEntity extends BaseEntityInterface {
   postId: string;
   parentId: string | null;
   constructor(params: {
+    id: string;
     content: string;
     userId: string;
     postId: string;
     parentId: string | null;
   }) {
-    super();
+    super(params.id);
     this.content = params.content;
     this.userId = params.userId;
     this.postId = params.postId;

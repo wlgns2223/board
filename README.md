@@ -17,3 +17,7 @@
         Update,
         Delete,
     Post,
+
+참고
+https://github.com/jojoldu/monorepo-nestjs-typeorm/blob/master/apps/api/src/user/dto/UserSignupReq.ts
+https://jojoldu.tistory.com/610

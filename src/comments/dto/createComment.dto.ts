@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { CommentEntity } from '../comment.entity';
-import { PickType } from '@nestjs/mapped-types';
-import { Exclude, Expose, instanceToPlain } from 'class-transformer';
+import { Expose } from 'class-transformer';
+import { v4 as uuidv4 } from 'uuid';
 
 interface IDTO<T> {
   toEntity: () => T;
@@ -46,6 +46,7 @@ export class CreateCommentDto implements IDTO<CommentEntity> {
 
   toEntity() {
     return new CommentEntity({
+      id: uuidv4(),
       content: this.content,
       parentId: this.parentId,
       postId: this.postId,

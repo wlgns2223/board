@@ -18,7 +18,6 @@ export class CommentController {
 
   @Post()
   async createComment(@Body() createCommentDto: CreateCommentDto) {
-    const comment = createCommentDto.toEntity();
-    return await this.commentService.createComment(comment);
+    return await this.commentService.createComment(createCommentDto);
   }
 }

@@ -32,10 +32,15 @@ export class PostsRepository {
   }
 
   async findPostById(postId: string) {
-    const sql = `SELECT P.id AS postId, title, content, P.createdAt, P.updatedAt, U.id AS userId, email, nickname  
+    const sql = `SELECT P.id AS postId, title, content, P.created_at AS createdAt, P.updated_at AS updatedAt, U.id AS userId, email, nickname  
     FROM posts AS P JOIN users AS U ON P.author_id = U.id WHERE P.id = "${postId}"`;
-    const result = await this.db.query(sql, [postId]);
-    return Array.isArray(result) ? result[0] : result;
+    try {
+      const result = await this.db.query(sql, [postId]);
+      return Array.isArray(result) ? result[0] : result;
+    } catch (error) {
+      this.logger.error(error);
+      throw new Error("Couldn't find post");
+    }
   }
 
   async updatePostById(postId: string, attrs: UpdatePostDto) {
