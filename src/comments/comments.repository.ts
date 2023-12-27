@@ -15,7 +15,8 @@ export class CommentRepository {
 
   async findCommentById(id: string): Promise<CommentEntity> {
     const sql = `SELECT 
-    C.id, C.content,C.post_id AS postId,C.created_at AS createdAt,C.parent_id AS parentId, U.email FROM comments AS C
+    C.id, C.content,C.post_id AS postId,C.created_at AS createdAt,C.parent_id AS parentId, U.email 
+    FROM comments AS C
     JOIN posts AS P ON C.post_id = P.id
     JOIN users AS U ON C.user_id = U.id
     WHERE C.id = ?

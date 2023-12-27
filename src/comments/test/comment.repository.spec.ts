@@ -2,9 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CommentRepository } from '../comments.repository';
 import { DBService } from '../../database/db.service';
 import { CreateCommentDto } from '../dto/createComment.dto';
-import { Query } from '@nestjs/common';
 import { QueryHelper } from '../../common/utils/queryHelper';
-import { classToPlain, instanceToPlain } from 'class-transformer';
+
+const fakeUUID = 'fakeUUID';
+jest.mock('uuid', () => {
+  return {
+    v4: () => fakeUUID,
+  };
+});
 
 describe('CommentRepository', () => {
   const queryMock = jest.fn();
@@ -36,24 +41,45 @@ describe('CommentRepository', () => {
   });
 
   it('shuold create a comment', async () => {
-    const dto = CreateCommentDto.of(
+    const entity = CreateCommentDto.of(
       'fakeContent',
       'fakeUserId',
       'fakePostId',
       null,
     ).toEntity();
 
+    const queryHelper = new QueryHelper(entity);
+    const columns = queryHelper.toColumns();
+    const placesholders = queryHelper.toPlaceholders();
+    const values = queryHelper.toValues();
+    const sql = `INSERT INTO comments ${columns} VALUES ${placesholders}`;
+    queryMock.mockResolvedValue(entity);
+    helpInsertMock.mockReturnValue({ columns, placesholders, values });
+    jest.spyOn(commentRepository, 'findCommentById').mockResolvedValue(entity);
+
+    const actual = await commentRepository.createComment(entity);
+
+    expect(actual).toEqual(entity);
+    expect(queryMock).toHaveBeenCalledWith(sql, values);
+  });
+
+  it('should throw an error on fail to create', async () => {
+    const dto = CreateCommentDto.of(
+      'fakeContent',
+      'fakeUserId',
+      'fakePostId',
+      null,
+    ).toEntity();
     const queryHelper = new QueryHelper(dto);
     const columns = queryHelper.toColumns();
     const placesholders = queryHelper.toPlaceholders();
     const values = queryHelper.toValues();
     const sql = `INSERT INTO comments ${columns} VALUES ${placesholders}`;
-    queryMock.mockResolvedValue(null);
-    helpInsertMock.mockReturnValue({ columns, placesholders, values });
+    queryMock.mockRejectedValue('error');
+    jest
+      .spyOn(commentRepository['logger'], 'error')
+      .mockImplementation(() => {});
 
-    const result = await commentRepository.createComment(dto);
-
-    expect(result).toBe(null);
-    expect(queryMock).toHaveBeenCalledWith(sql, values);
+    await expect(commentRepository.createComment(dto)).rejects.toThrow(Error);
   });
 });

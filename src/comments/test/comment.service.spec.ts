@@ -7,6 +7,10 @@ import { CommentEntity } from '../comment.entity';
 import { CreateCommentDto } from '../dto/createComment.dto';
 import { User } from '../../users/user.model';
 import { Post } from '../../posts/posts.model';
+const fakeUUID = 'fakeUUID';
+jest.mock('uuid', () => ({
+  v4: () => fakeUUID,
+}));
 
 /**
  * Mocking 함수말고
@@ -22,6 +26,8 @@ describe('Comment Service', () => {
   const createCommentMock = jest.fn();
   const findUserByIdMock = jest.fn();
   const findPostByIdMock = jest.fn();
+
+  const v4Mock = jest.fn();
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -62,12 +68,12 @@ describe('Comment Service', () => {
   });
 
   it('should create a comment', async () => {
-    const expected = new CreateCommentDto(
+    const expected = CreateCommentDto.of(
       'fakeContent',
       'fakeUserId',
       'fakePostId',
       null,
-    ).toEntity();
+    );
     const fakeUser = User.fromPlain({
       id: 'fakeId',
       email: 'fakeEmail',
@@ -82,10 +88,15 @@ describe('Comment Service', () => {
     });
     jest.spyOn(userService, 'findUserById').mockResolvedValue(fakeUser);
     jest.spyOn(postService, 'findPostById').mockResolvedValue(fakePost);
-    jest.spyOn(commentRepository, 'createComment').mockResolvedValue(expected);
+    jest
+      .spyOn(commentRepository, 'createComment')
+      .mockResolvedValue(expected.toEntity());
 
     const actual = await commentService.createComment(expected);
 
-    expect(actual).toEqual(expected);
+    expect(actual).toEqual({
+      ...expected,
+      id: fakeUUID,
+    });
   });
 });
