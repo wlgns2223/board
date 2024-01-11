@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Logger,
   Param,
   Post,
@@ -12,6 +14,8 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create.dto';
 import { UpdateUserDto } from './dto/update.dto';
+import { BaseResponse } from '../common/response/base';
+import { UserWithoutPassword } from './user.types';
 
 @Controller('users')
 export class UsersController {
@@ -20,7 +24,15 @@ export class UsersController {
 
   @Get()
   async getUserByEmail(@Query('email') email: string) {
-    return await this.usersService.getUserByEmail(email);
+    const res = new BaseResponse<UserWithoutPassword>();
+    try {
+      const result = await this.usersService.getUserByEmail(email);
+      res.onSuccess(result);
+    } catch (error: any) {
+      res.onError(error.response.message, error.status);
+    } finally {
+      return res.serialize();
+    }
   }
 
   @Post()

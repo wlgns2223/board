@@ -3,6 +3,7 @@ import { DBService } from '../database/db.service';
 import { User } from './user.model';
 import { CreateUserDto } from './dto/create.dto';
 import { plainToClass } from 'class-transformer';
+import { UserWithoutPassword } from './user.types';
 
 @Injectable()
 export class UsersRepository {
@@ -16,7 +17,7 @@ export class UsersRepository {
     return plainToClass(User, result[0]);
   }
 
-  async getUserByEmail(email: string) {
+  async getUserByEmail(email: string): Promise<UserWithoutPassword> {
     const userKeys = Object.keys(User.fromPlain({}))
       .filter((key) => key != 'password')
       .join(',');
@@ -27,7 +28,7 @@ export class UsersRepository {
   }
 
   async createUser(createDto: CreateUserDto) {
-    let user: User | undefined = undefined;
+    let user: UserWithoutPassword | undefined = undefined;
 
     const columns = Object.keys(createDto).join(',');
     const values = Object.values(createDto)
@@ -45,8 +46,8 @@ export class UsersRepository {
     return user;
   }
 
-  async updateUser(email: string, attrs: Partial<User>) {
-    let result: User | undefined = undefined;
+  async updateUser(email: string, attrs: Partial<UserWithoutPassword>) {
+    let result: UserWithoutPassword | undefined = undefined;
     try {
       const update = this.conn.helpUpdate(attrs);
       const sql = `UPDATE users SET ${update} WHERE email = "${email}"`;
