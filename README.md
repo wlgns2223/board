@@ -21,3 +21,6 @@
 참고
 https://github.com/jojoldu/monorepo-nestjs-typeorm/blob/master/apps/api/src/user/dto/UserSignupReq.ts
 https://jojoldu.tistory.com/610
+
+https://velog.io/@intellik/NestJS-효과적인-예외-핸들링
+https://cheese10yun.github.io/spring-guide-exception/

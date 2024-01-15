@@ -7,6 +7,7 @@ import { UsersRepository } from './users.repository';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create.dto';
 import { UpdateUserDto } from './dto/update.dto';
+import { EntityNotFoundException } from '../common/exception/serviceException';
 
 @Injectable()
 export class UsersService {
@@ -19,7 +20,7 @@ export class UsersService {
   async getUserByEmail(email: string) {
     const user = await this.userRepository.getUserByEmail(email);
     if (!user) {
-      throw new NotFoundException('User Not Found');
+      throw EntityNotFoundException(email);
     }
     return user;
   }

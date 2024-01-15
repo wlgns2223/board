@@ -16,7 +16,6 @@ import { CreateUserDto } from './dto/create.dto';
 import { UpdateUserDto } from './dto/update.dto';
 import { BaseResponse } from '../common/response/base';
 import { UserWithoutPassword } from './user.types';
-import { Response } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -24,17 +23,9 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get()
-  async getUserByEmail(@Query('email') email: string, @Res() res: Response) {
-    const response = new BaseResponse<UserWithoutPassword>();
-
-    try {
-      const result = await this.usersService.getUserByEmail(email);
-      response.onSuccess(result);
-    } catch (error: any) {
-      response.onError(error.response.message, error.status);
-    } finally {
-      return res.status(response.status).json(response.serialize());
-    }
+  async getUserByEmail(@Query('email') email: string) {
+    const user = await this.usersService.getUserByEmail(email);
+    return BaseResponse.of<UserWithoutPassword>(user);
   }
 
   @Post()
