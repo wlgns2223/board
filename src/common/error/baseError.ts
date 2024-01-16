@@ -1,11 +1,18 @@
 import { HttpStatus } from '@nestjs/common';
 
+/**
+ * 공통 에러 객체
+ */
 export class BaseError {
   protected readonly _status: HttpStatus;
-  protected readonly _message: string;
+  protected _message: string;
 
   constructor(status: HttpStatus, message: string) {
     this._status = status;
+    this._message = message;
+  }
+
+  set message(message) {
     this._message = message;
   }
 

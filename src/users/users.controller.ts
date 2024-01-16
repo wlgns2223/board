@@ -25,7 +25,7 @@ export class UsersController {
   @Get()
   async getUserByEmail(@Query('email') email: string) {
     const user = await this.usersService.getUserByEmail(email);
-    return BaseResponse.of<UserWithoutPassword>(user);
+    return BaseResponse.of<{ user: UserWithoutPassword }>({ user });
   }
 
   @Post()
