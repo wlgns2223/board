@@ -1,5 +1,10 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { BaseError, ENTITY_NOT_FOUND } from '../error/baseError';
+import { BaseError } from '../error/baseError';
+import {
+  ENTITY_ALREADY_EXISTS,
+  ENTITY_NOT_FOUND,
+  INVALID_DATA,
+} from '../error/errors';
 
 /**
  * 발생시킬 Custom Exception
@@ -23,6 +28,14 @@ export class ServiceException extends HttpException {
 
 export const EntityNotFoundException = (message?: string) => {
   return ServiceException.of(ENTITY_NOT_FOUND, message);
+};
+
+export const MissingDataException = (message?: string) => {
+  return ServiceException.of(INVALID_DATA, message);
+};
+
+export const EntityAlreadyExistsException = (message?: string) => {
+  return ServiceException.of(ENTITY_ALREADY_EXISTS, message);
 };
 
 // 에러 클래스를 정의하고 그 에러를 가지는 커스텀 예외를 던진다

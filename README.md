@@ -24,3 +24,8 @@ https://jojoldu.tistory.com/610
 
 https://velog.io/@intellik/NestJS-효과적인-예외-핸들링
 https://cheese10yun.github.io/spring-guide-exception/
+
+## TODO
+
+1. User Entity가 유저 역할로서 책임을 하도록 메소드 추가
+2. User Entity의 메소드를 테스트 코드로 작성

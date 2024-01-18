@@ -2,8 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { DBService } from '../database/db.service';
 import { User } from './user.model';
 import { CreateUserDto } from './dto/create.dto';
-import { plainToClass } from 'class-transformer';
 import { UserWithoutPassword } from './user.types';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UsersRepository {
@@ -12,33 +12,28 @@ export class UsersRepository {
 
   async findUserById(id: string) {
     const sql = `SELECT * FROM users WHERE id = ?`;
-    const result = await this.conn.query(sql, [id]);
-
-    return plainToClass(User, result[0]);
+    const result = (await this.conn.query(sql, [id])) as User;
+    return plainToInstance(User, result[0]);
   }
 
-  async getUserByEmail(email: string): Promise<UserWithoutPassword> {
-    const userKeys = Object.keys(User.fromPlain({}))
-      .filter((key) => key != 'password')
-      .join(',');
-
-    const sql = `SELECT ${userKeys} FROM users WHERE email = ?`;
+  async getUserByEmail(email: string): Promise<User> {
+    const sql = `SELECT * FROM users WHERE email = ?`;
     const result = await this.conn.query(sql, [email]);
-    return result[0];
+    return plainToInstance(User, result[0]);
   }
 
-  async createUser(createDto: CreateUserDto) {
-    let user: UserWithoutPassword | undefined = undefined;
+  async createUser(userData: User) {
+    let user: User | undefined = undefined;
 
-    const columns = Object.keys(createDto).join(',');
-    const values = Object.values(createDto)
+    const columns = Object.keys(userData).join(',');
+    const values = Object.values(userData)
       .map((value) => '?')
       .join(',');
 
     try {
       const sql = `INSERT INTO users (${columns}) VALUES (${values})`;
-      await this.conn.query(sql, [...Object.values(createDto)]);
-      user = await this.getUserByEmail(createDto.email);
+      await this.conn.query(sql, [...Object.values(userData)]);
+      user = await this.getUserByEmail(userData.email);
     } catch (error) {
       this.logger.error(error);
     }

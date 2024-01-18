@@ -4,17 +4,20 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
-import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create.dto';
 import { UpdateUserDto } from './dto/update.dto';
-import { EntityNotFoundException } from '../common/exception/serviceException';
+import {
+  EntityAlreadyExistsException,
+  EntityNotFoundException,
+} from '../common/exception/serviceException';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
   constructor(private userRepository: UsersRepository) {}
 
   async findUserById(id: string) {
-    return this.userRepository.findUserById(id);
+    return await this.userRepository.findUserById(id);
   }
 
   async getUserByEmail(email: string) {
@@ -26,18 +29,15 @@ export class UsersService {
   }
 
   async createUser(createDto: CreateUserDto) {
-    const user = await this.userRepository.getUserByEmail(createDto.email);
-    if (user) {
-      throw new BadRequestException('User already exists');
+    const found = await this.userRepository.getUserByEmail(createDto.email);
+    if (found) {
+      throw EntityAlreadyExistsException('user already exists');
     }
 
-    const salt = await bcrypt.genSalt();
-    const hashed = await bcrypt.hash(createDto.password, salt);
+    const user = createDto.toEntity();
+    await user.hashPassword(createDto.password);
 
-    return await this.userRepository.createUser({
-      ...createDto,
-      password: hashed,
-    });
+    return await this.userRepository.createUser(user);
   }
 
   async updateUser(email: string, updateUserDto: UpdateUserDto) {

@@ -64,15 +64,15 @@ const seedUsers = async () => {
   const conn = await pool.getConnection();
   const sql = 'INSERT INTO USERS (email, password, nickname) VALUES (?,?,?)';
 
-  Array.from({ length: 10 }).forEach(async () => {
-    const dto: CreateUserDto = {
-      email: faker.internet.email(),
-      password: faker.internet.password(),
-      nickname: faker.internet.userName(),
-    };
+  // Array.from({ length: 10 }).forEach(async () => {
+  //   const dto: CreateUserDto = {
+  //     email: faker.internet.email(),
+  //     password: faker.internet.password(),
+  //     nickname: faker.internet.userName(),
+  //   };
 
-    await conn.query(sql, Object.values(dto));
-  });
+  //   await conn.query(sql, Object.values(dto));
+  // });
   console.log('end...');
 };
 

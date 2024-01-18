@@ -1,7 +1,7 @@
 import { IsEmail, IsNotEmpty } from 'class-validator';
-import { User, UserAttrs } from '../user.model';
+import { User } from '../user.model';
 
-export class CreateUserDto implements UserAttrs {
+export class CreateUserDto {
   @IsEmail()
   email: string;
 
@@ -10,4 +10,8 @@ export class CreateUserDto implements UserAttrs {
 
   @IsNotEmpty()
   password: string;
+
+  toEntity() {
+    return User.from(this.email, this.nickname, this.password);
+  }
 }

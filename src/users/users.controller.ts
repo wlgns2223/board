@@ -16,6 +16,8 @@ import { CreateUserDto } from './dto/create.dto';
 import { UpdateUserDto } from './dto/update.dto';
 import { BaseResponse } from '../common/response/base';
 import { UserWithoutPassword } from './user.types';
+import { UserDto } from './dto/user.dto';
+import { User } from './user.model';
 
 @Controller('users')
 export class UsersController {
@@ -25,12 +27,15 @@ export class UsersController {
   @Get()
   async getUserByEmail(@Query('email') email: string) {
     const user = await this.usersService.getUserByEmail(email);
-    return BaseResponse.of<{ user: UserWithoutPassword }>({ user });
+    const userDto = UserDto.from(user);
+    return BaseResponse.of<{ user: UserDto }>({ user: userDto });
   }
 
   @Post()
   async createUser(@Body() dto: CreateUserDto) {
-    return await this.usersService.createUser(dto);
+    const userEntity = await this.usersService.createUser(dto);
+    const userDto = UserDto.from(userEntity);
+    return BaseResponse.of<{ user: UserDto }>({ user: userDto });
   }
 
   @Put(':email')

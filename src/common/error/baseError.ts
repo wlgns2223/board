@@ -24,8 +24,3 @@ export class BaseError {
     return this._message;
   }
 }
-
-export const ENTITY_NOT_FOUND = new BaseError(
-  HttpStatus.NOT_FOUND,
-  'Entity Not Found',
-);

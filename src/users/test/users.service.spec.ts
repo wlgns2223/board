@@ -20,6 +20,14 @@ describe('UsersService', () => {
     password: 'password',
     nickname: 'nickname',
   };
+  const fakeUser: User = {
+    id: 'fakeId',
+    email: 'fakeEmail',
+    password: 'fakePassword',
+    nickname: 'fakeNickname',
+    createdAt: new Date('2022-01-01T00:00:00Z'),
+    updatedAt: new Date('2022-01-01T00:00:00Z'),
+  };
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -117,20 +125,28 @@ describe('UsersService', () => {
 
   it('should get a user by id ', async () => {
     const id = '1234';
-    const user = User.fromPlain({
+    const fakeUser = User.from({
       id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      email: 'fakeEmail',
+      nickname: 'fakeNickname',
+      password: 'fakePassword',
     });
-    findUserByIdMock.mockResolvedValue(user);
+
+    findUserByIdMock.mockResolvedValue(fakeUser);
 
     const result = await usersService.findUserById(id);
 
-    expect(result).toEqual(user);
+    expect(result).toEqual(fakeUser);
+    expect(id).toBe(result.id);
     expect(findUserByIdMock).toHaveBeenCalledWith(id);
   });
 
   it('should delete a user by email', async () => {
     const email = 'test@gmail.com';
-    const user = User.fromPlain({
+    const user = User.from({
+      ...fakeUser,
       email,
     });
     getUserByEmailMock.mockResolvedValue(user);
@@ -157,7 +173,8 @@ describe('UsersService', () => {
 
   it("should throw an error when repository layer can't delete a user", async () => {
     const email = 'test@gmail.com';
-    const user = User.fromPlain({
+    const user = User.from({
+      ...fakeUser,
       email,
     });
     getUserByEmailMock.mockResolvedValue(user);

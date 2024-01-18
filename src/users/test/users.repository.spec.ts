@@ -65,10 +65,8 @@ describe('UsersRepository', () => {
   it('should return user by email', async () => {
     //Arange
     query.mockResolvedValue([fakeUser]);
-    const userKeys = Object.keys(User.fromPlain({}))
-      .filter((key) => key !== 'password')
-      .join(',');
-    const sql = `SELECT ${userKeys} FROM users WHERE email = ?`;
+
+    const sql = `SELECT * FROM users WHERE email = ?`;
 
     //Act
     const result = await usersRepository.getUserByEmail(fakeUser.email);
@@ -126,17 +124,16 @@ describe('UsersRepository', () => {
 
   it('should get a user by id', async () => {
     const id = '1234';
-    const fakeUser = User.fromPlain({
+    const fakeUser = User.from({
+      id,
       email: 'email@gmail.com',
       password: 'password',
-      id,
       nickname: 'nickname',
       createdAt: new Date(),
       updatedAt: new Date(),
     });
     const sql = `SELECT * FROM users WHERE id = ?`;
     const expected = { ...fakeUser };
-    delete expected.password;
     query.mockResolvedValue([fakeUser]);
 
     const result = await usersRepository.findUserById(id);
