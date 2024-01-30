@@ -28,9 +28,13 @@ export class User {
     return user;
   }
 
-  public async hashPassword(password) {
+  public async hashPassword(password: string) {
     const salt = await bcrypt.genSalt();
     const hashed = await bcrypt.hash(password, salt);
     this.password = hashed;
+  }
+
+  public async comparePassword(passwordToCompare: string) {
+    return bcrypt.compare(passwordToCompare, this.password);
   }
 }

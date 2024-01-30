@@ -27,5 +27,7 @@ https://cheese10yun.github.io/spring-guide-exception/
 
 ## TODO
 
-1. User Entity가 유저 역할로서 책임을 하도록 메소드 추가
-2. User Entity의 메소드를 테스트 코드로 작성
+1. UnauthorizedException 에러코드 작성 ㅇㅇ
+2. Auth Service Password Compare 로직 -> User Entity가 책임을 지도록 ㅇㅇ
+3. password compare후 에러를 던지거나 토큰을 발급하거나 ㅇㅇ
+4. 위 내용에 대한 테스트코드 및 포스트맨 테스트 ㅇㅇ

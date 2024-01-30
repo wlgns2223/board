@@ -4,6 +4,7 @@ import {
   ENTITY_ALREADY_EXISTS,
   ENTITY_NOT_FOUND,
   INVALID_DATA,
+  UNAUTHORIZED,
 } from '../error/errors';
 
 /**
@@ -36,6 +37,10 @@ export const MissingDataException = (message?: string) => {
 
 export const EntityAlreadyExistsException = (message?: string) => {
   return ServiceException.of(ENTITY_ALREADY_EXISTS, message);
+};
+
+export const UnmatchedPassword = (message?: string) => {
+  return ServiceException.of(UNAUTHORIZED, message);
 };
 
 // 에러 클래스를 정의하고 그 에러를 가지는 커스텀 예외를 던진다

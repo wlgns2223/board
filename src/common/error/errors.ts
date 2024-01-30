@@ -11,4 +11,9 @@ export const INVALID_DATA = new BaseError(
   'Data is missing',
 );
 
+export const UNAUTHORIZED = new BaseError(
+  HttpStatus.UNAUTHORIZED,
+  'Unauthorized Request',
+);
+
 export const ENTITY_ALREADY_EXISTS = INVALID_DATA;

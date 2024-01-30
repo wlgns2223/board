@@ -15,9 +15,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create.dto';
 import { UpdateUserDto } from './dto/update.dto';
 import { BaseResponse } from '../common/response/base';
-import { UserWithoutPassword } from './user.types';
 import { UserDto } from './dto/user.dto';
-import { User } from './user.model';
 
 @Controller('users')
 export class UsersController {
