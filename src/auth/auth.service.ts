@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import { TokenPayload, TokenService } from './token.service';
+import { ITokenPayload, TokenPayload, TokenService } from './token.service';
 import { UnmatchedPassword } from '../common/exception/serviceException';
 
 @Injectable()
@@ -13,12 +13,14 @@ export class AuthService {
   // 로그인
   async signIn(userEmail: string, password: string) {
     const user = await this.userService.getUserByEmail(userEmail);
-    const doesPasswordMatch = user.comparePassword(password);
+
+    const doesPasswordMatch = await user.comparePassword(password);
+
     if (!doesPasswordMatch) {
       throw UnmatchedPassword('Password is not matched');
     }
 
     const payload = new TokenPayload(userEmail);
-    return await this.tokenService.signToken(payload);
+    return await this.tokenService.signToken(payload.toPlain<ITokenPayload>());
   }
 }

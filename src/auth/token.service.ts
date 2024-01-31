@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { instanceToPlain } from 'class-transformer';
 
 export interface ITokenPayload {
   sub: string;
@@ -30,5 +31,9 @@ export class TokenPayload {
 
   get sub() {
     return this._sub;
+  }
+
+  toPlain<T>() {
+    return instanceToPlain(this) as T;
   }
 }

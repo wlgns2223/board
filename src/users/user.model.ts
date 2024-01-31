@@ -12,7 +12,6 @@ export class User {
 
   nickname: string;
 
-  @Exclude()
   password: string;
 
   createdAt: Date;
@@ -35,6 +34,6 @@ export class User {
   }
 
   public async comparePassword(passwordToCompare: string) {
-    return bcrypt.compare(passwordToCompare, this.password);
+    return await bcrypt.compare(passwordToCompare, this.password);
   }
 }
