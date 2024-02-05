@@ -2,7 +2,7 @@ import type { Config } from 'jest';
 const config: Config = {
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: 'src',
-  testMatch: ['<rootDir>/users/test/**/*.service.spec.ts'],
+  testMatch: ['<rootDir>/auth/test/**/*.service.spec.ts'],
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
