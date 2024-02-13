@@ -38,7 +38,7 @@ export class DBService {
     return this.queryHelper.toUpdate();
   }
 
-  helpInsert(obj: any) {
+  helpInsert<T = any>(obj: T) {
     const snakeCaseObj = this.toSnakeCase(obj);
     this.queryHelper.setObj(snakeCaseObj);
 

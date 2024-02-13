@@ -22,16 +22,28 @@ export class AuthController {
 
   @Post()
   async signIn(@Body() dto: SignInDto, @Res() res: Response) {
-    const tokens = await this.authService.signIn(dto.email, dto.password);
+    const { accessToken, refreshToken } = await this.authService.signIn(
+      dto.email,
+      dto.password,
+    );
 
     const accessTokenName = this.configService.get('ACCESS_TOKEN_NAME');
     if (!accessTokenName) {
-      throw new InternalServerErrorException(
-        'ACCESS_TOKEN_NAME is not defined',
-      );
+      throw new InternalServerErrorException('Wrong Configure !');
     }
 
-    res.cookie(accessTokenName, tokens.accessToken, {
+    res.cookie(accessTokenName, accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'none',
+    });
+
+    const refreshTokenName = this.configService.get('REFRESH_TOKEN_NAME');
+    if (!accessTokenName) {
+      throw new InternalServerErrorException('Wrong Configure !');
+    }
+
+    res.cookie(refreshTokenName, refreshToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'none',

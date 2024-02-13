@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Exclude, Expose, instanceToPlain } from 'class-transformer';
+import { TokenRepository } from '../users/token.repository';
 
 export interface ITokenPayload {
   sub: string;
@@ -8,20 +9,27 @@ export interface ITokenPayload {
 
 @Injectable()
 export class TokenService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private tokenRepository: TokenRepository,
+  ) {}
 
   async signToken(payload: ITokenPayload) {
     const accessToken = await this.jwtService.signAsync(payload, {
       expiresIn: '1h',
     });
     const refreshToken = await this.jwtService.signAsync(payload, {
-      expiresIn: '1d',
+      expiresIn: '7d',
     });
 
     return {
       accessToken,
       refreshToken,
     };
+  }
+
+  async storeToken(token: string, userId: string) {
+    return await this.tokenRepository.storeToken(token, userId);
   }
 }
 

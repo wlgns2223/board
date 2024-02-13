@@ -21,6 +21,11 @@ export class AuthService {
     }
 
     const payload = new TokenPayload(userEmail);
-    return await this.tokenService.signToken(payload.toPlain<ITokenPayload>());
+    const tokens = await this.tokenService.signToken(
+      payload.toPlain<ITokenPayload>(),
+    );
+    await this.tokenService.storeToken(tokens.refreshToken, user.id);
+
+    return tokens;
   }
 }

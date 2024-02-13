@@ -10,7 +10,6 @@ import {
   EntityAlreadyExistsException,
   EntityNotFoundException,
 } from '../common/exception/serviceException';
-import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UsersService {

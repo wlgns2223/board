@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TokenService } from './token.service';
 import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
+import { TokenRepository } from '../users/token.repository';
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { UsersModule } from '../users/users.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, TokenService],
+  providers: [AuthService, TokenService, TokenRepository],
 })
 export class AuthModule {}

@@ -27,8 +27,11 @@ https://cheese10yun.github.io/spring-guide-exception/
 
 ## TODO
 
-1. UnauthorizedException 에러코드 작성 ㅇㅇ
-2. Auth Service Password Compare 로직 -> User Entity가 책임을 지도록 ㅇㅇ
-3. password compare후 에러를 던지거나 토큰을 발급하거나 ㅇㅇ
-4. 위 내용에 대한 포스트맨 테스트 ㅇㅇ
-5. 테스트 코드 작성
+1. Refresh Token 테이블 생성 ㅇㅇ
+2. Sign in시에 access token, refresh token을 쿠키에 저장 ㅇㅇ
+3. Auth Guard 추가
+4. 재발급 시나리오 추가
+   4-1. access token 만료, refresh token 유효
+   4-2. access token 만료, refresh token 만료
+   4-3. access token 유효, refresh token 만료
+   4-4. access token 유효, refresh token 유효
