@@ -24,8 +24,12 @@ export class AuthService {
     const tokens = await this.tokenService.signToken(
       payload.toPlain<ITokenPayload>(),
     );
-    await this.tokenService.storeToken(tokens.refreshToken, user.id);
+    // await this.tokenService.storeToken(tokens.refreshToken, user.id);
 
     return tokens;
+  }
+
+  async verifyToken(token: string) {
+    return await this.tokenService.verifyToken(token);
   }
 }

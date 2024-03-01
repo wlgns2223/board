@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Header,
   InternalServerErrorException,
   Logger,
   Post,
@@ -9,8 +10,9 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dto/signIn.dto';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { AccessToken } from '../common/decorators/accessToken.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -51,6 +53,18 @@ export class AuthController {
 
     return res.json({
       message: 'success',
+    });
+  }
+
+  @Post('verify')
+  async verify(@AccessToken() token: string, @Res() res: Response) {
+    console.log('token', token);
+
+    const payload = await this.authService.verifyToken(token);
+
+    return res.json({
+      message: 'success',
+      payload,
     });
   }
 }

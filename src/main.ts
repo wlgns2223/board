@@ -5,6 +5,7 @@ import {
   Logger,
   ValidationPipe,
 } from '@nestjs/common';
+import cookieParser from 'cookie-parser';
 import { ServiceExceptionHttpFilter } from './common/filter/serviceExceptionHttpFilter';
 
 export const logger = new Logger('global');
@@ -15,6 +16,7 @@ async function bootstrap() {
     origin: ['http://localhost:3000'],
   });
 
+  app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
