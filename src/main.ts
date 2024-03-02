@@ -5,7 +5,7 @@ import {
   Logger,
   ValidationPipe,
 } from '@nestjs/common';
-import cookieParser from 'cookie-parser';
+import * as cookieParser from 'cookie-parser';
 import { ServiceExceptionHttpFilter } from './common/filter/serviceExceptionHttpFilter';
 
 export const logger = new Logger('global');

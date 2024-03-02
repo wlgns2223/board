@@ -1,10 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { ITokenPayload, TokenPayload, TokenService } from './token.service';
-import { UnmatchedPassword } from '../common/exception/serviceException';
+import {
+  TokenException,
+  UnmatchedPassword,
+} from '../common/exception/serviceException';
 
 @Injectable()
 export class AuthService {
+  private logger = new Logger(AuthService.name);
   constructor(
     private userService: UsersService,
     private tokenService: TokenService,
@@ -26,10 +30,15 @@ export class AuthService {
     );
     // await this.tokenService.storeToken(tokens.refreshToken, user.id);
 
-    return tokens;
+    return tokens.accessToken;
   }
 
   async verifyToken(token: string) {
-    return await this.tokenService.verifyToken(token);
+    try {
+      return await this.tokenService.verifyToken(token);
+    } catch (error) {
+      this.logger.error(error);
+      throw TokenException('Access Token Expires');
+    }
   }
 }

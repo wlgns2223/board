@@ -8,6 +8,11 @@ export interface ITokenPayload {
   sub: string;
 }
 
+export interface IJWTPayload extends ITokenPayload {
+  iat: number;
+  exp: number;
+}
+
 @Injectable()
 export class TokenService {
   constructor(
@@ -18,7 +23,7 @@ export class TokenService {
 
   async signToken(payload: ITokenPayload) {
     const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: '1h',
+      expiresIn: '10s',
     });
     const refreshToken = await this.jwtService.signAsync(payload, {
       expiresIn: '7d',
@@ -30,8 +35,15 @@ export class TokenService {
     };
   }
 
+  /**
+   *  Access Token이
+   *  만료되지 않으면 Payload를 리턴하고
+   *  만료되었다면 verifyAsync 함수가 에러를 던진다. TokenExpiredError: jwt expired
+   *
+   *
+   */
   async verifyToken(token: string) {
-    return await this.jwtService.verifyAsync<ITokenPayload>(token, {
+    return await this.jwtService.verifyAsync<IJWTPayload>(token, {
       secret: this.configService.get('TOKEN_SECRET'),
     });
   }

@@ -16,4 +16,9 @@ export const UNAUTHORIZED = new BaseError(
   'Unauthorized Request',
 );
 
+export const INTERNAL_SERVER_ERROR = new BaseError(
+  HttpStatus.INTERNAL_SERVER_ERROR,
+  'Internal Server Error',
+);
+
 export const ENTITY_ALREADY_EXISTS = INVALID_DATA;

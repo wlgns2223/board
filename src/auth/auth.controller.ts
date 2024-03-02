@@ -24,28 +24,14 @@ export class AuthController {
 
   @Post()
   async signIn(@Body() dto: SignInDto, @Res() res: Response) {
-    const { accessToken, refreshToken } = await this.authService.signIn(
-      dto.email,
-      dto.password,
-    );
-
     const accessTokenName = this.configService.get('ACCESS_TOKEN_NAME');
     if (!accessTokenName) {
       throw new InternalServerErrorException('Wrong Configure !');
     }
 
+    const accessToken = await this.authService.signIn(dto.email, dto.password);
+
     res.cookie(accessTokenName, accessToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'none',
-    });
-
-    const refreshTokenName = this.configService.get('REFRESH_TOKEN_NAME');
-    if (!accessTokenName) {
-      throw new InternalServerErrorException('Wrong Configure !');
-    }
-
-    res.cookie(refreshTokenName, refreshToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'none',
@@ -58,13 +44,26 @@ export class AuthController {
 
   @Post('verify')
   async verify(@AccessToken() token: string, @Res() res: Response) {
-    console.log('token', token);
+    /**
+     *  1. Refresh Token을 확인한다. Refresh Token이 없거나 만료 된 경우 에러를 리턴한다.
+     *   const isRefrshTokenValid = await this.authService.verifyRefreshToken(userId)
+     *   if(isRefrshTokenValid){
+     *      throw SomeCustomError()
+     *    }
+     *
+     *    const newAccesToken = await this.authService.renewAccessToken(userId)
+     *    res.cookie(tokenName,token, options)
+     *    res.json({message:'success'})
+     *
+     */
 
     const payload = await this.authService.verifyToken(token);
 
     return res.json({
       message: 'success',
-      payload,
+      data: {
+        payload,
+      },
     });
   }
 }

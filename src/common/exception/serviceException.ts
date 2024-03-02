@@ -3,6 +3,7 @@ import { BaseError } from '../error/baseError';
 import {
   ENTITY_ALREADY_EXISTS,
   ENTITY_NOT_FOUND,
+  INTERNAL_SERVER_ERROR,
   INVALID_DATA,
   UNAUTHORIZED,
 } from '../error/errors';
@@ -41,6 +42,14 @@ export const EntityAlreadyExistsException = (message?: string) => {
 
 export const UnmatchedPassword = (message?: string) => {
   return ServiceException.of(UNAUTHORIZED, message);
+};
+
+export const TokenException = (message?: string) => {
+  return ServiceException.of(UNAUTHORIZED, message);
+};
+
+export const InternalServerException = (message?: string) => {
+  return ServiceException.of(INTERNAL_SERVER_ERROR, message);
 };
 
 // 에러 클래스를 정의하고 그 에러를 가지는 커스텀 예외를 던진다
