@@ -5,6 +5,8 @@ import {
   TokenException,
   UnmatchedPassword,
 } from '../common/exception/serviceException';
+import { JsonWebTokenError, TokenExpiredError } from '@nestjs/jwt';
+import { RefreshToken } from '../users/token.model';
 
 @Injectable()
 export class AuthService {
@@ -28,9 +30,9 @@ export class AuthService {
     const tokens = await this.tokenService.signToken(
       payload.toPlain<ITokenPayload>(),
     );
-    // await this.tokenService.storeToken(tokens.refreshToken, user.id);
+    await this.tokenService.storeToken(tokens.refreshToken, user.id);
 
-    return tokens.accessToken;
+    return tokens;
   }
 
   async verifyToken(token: string) {
@@ -38,7 +40,24 @@ export class AuthService {
       return await this.tokenService.verifyToken(token);
     } catch (error) {
       this.logger.error(error);
-      throw TokenException('Access Token Expires');
+      if (error instanceof TokenExpiredError) {
+        throw TokenException('expired');
+      }
+
+      if (error instanceof JsonWebTokenError) {
+        throw TokenException('invalid');
+      }
+
+      throw TokenException(error.message);
     }
+  }
+
+  async compareRefreshToken(refreshToken: RefreshToken) {
+    const token = await this.tokenService.getToken(
+      refreshToken.refreshToken,
+      refreshToken.userId,
+    );
+
+    console.log(token);
   }
 }

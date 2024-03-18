@@ -21,4 +21,11 @@ export class TokenRepository {
 
     return result;
   }
+
+  async getToken(token: string, userId: string) {
+    const sql = `SELECT * FROM refresh_tokens WHERE refresh_token = ? AND user_id = ?`;
+    const result = await this.db.query(sql, [token, userId]);
+
+    return result;
+  }
 }

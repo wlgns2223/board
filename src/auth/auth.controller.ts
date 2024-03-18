@@ -13,6 +13,8 @@ import { SignInDto } from './dto/signIn.dto';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { AccessToken } from '../common/decorators/accessToken.decorator';
+import { RefreshTokenFromReq } from '../common/decorators/refreshToken.decorator';
+import { RefreshToken } from '../users/token.model';
 
 @Controller('auth')
 export class AuthController {
@@ -28,10 +30,20 @@ export class AuthController {
     if (!accessTokenName) {
       throw new InternalServerErrorException('Wrong Configure !');
     }
+    const refreshTokenName = this.configService.get('REFRESH_TOKEN_NAME');
+    if (!refreshTokenName) {
+      throw new InternalServerErrorException('Wrong Configure !');
+    }
 
-    const accessToken = await this.authService.signIn(dto.email, dto.password);
+    const tokens = await this.authService.signIn(dto.email, dto.password);
 
-    res.cookie(accessTokenName, accessToken, {
+    res.cookie(accessTokenName, tokens.accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'none',
+    });
+
+    res.cookie(refreshTokenName, tokens.refreshToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'none',
@@ -65,5 +77,14 @@ export class AuthController {
         payload,
       },
     });
+  }
+
+  @Post('renew-access-token')
+  async renew(@RefreshTokenFromReq() refreshToken: string) {
+    const payload = await this.authService.verifyToken(refreshToken);
+    console.log(payload);
+    const newAccessToken = await this.authService.compareRefreshToken(
+      RefreshToken.from(payload.sub, refreshToken),
+    );
   }
 }

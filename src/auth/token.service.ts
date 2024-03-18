@@ -39,8 +39,7 @@ export class TokenService {
    *  Access Token이
    *  만료되지 않으면 Payload를 리턴하고
    *  만료되었다면 verifyAsync 함수가 에러를 던진다. TokenExpiredError: jwt expired
-   *
-   *
+   *  잘못된 토큰이라면 TokenExpiredError: invalid token
    */
   async verifyToken(token: string) {
     return await this.jwtService.verifyAsync<IJWTPayload>(token, {
@@ -50,6 +49,10 @@ export class TokenService {
 
   async storeToken(token: string, userId: string) {
     return await this.tokenRepository.storeToken(token, userId);
+  }
+
+  async getToken(token: string, userId: string) {
+    return await this.tokenRepository.getToken(token, userId);
   }
 }
 

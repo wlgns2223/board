@@ -28,6 +28,7 @@ https://cheese10yun.github.io/spring-guide-exception/
 
 JWT 토큰 다루기
 https://www.reddit.com/r/reactjs/comments/14r0s8q/when_accesstoken_is_expired_for_jwt_authenication/
+https://inpa.tistory.com/entry/WEB-📚-Access-Token-Refresh-Token-원리-feat-JWT#access_/_refresh_token_재발급_원리
 
 ## TODO
 
@@ -42,7 +43,7 @@ https://www.reddit.com/r/reactjs/comments/14r0s8q/when_accesstoken_is_expired_fo
 
 설계한 JWT 토큰 핸들링 방법
 
-1. 클라이언트에서 API를 호출할때 헤더 쿠키에 access token을 함께 보낸다.
+1. 클라이언트에서 API를 호출할때 헤더 쿠키에 access token,refresh_token을 함께 보낸다.
 2. Guard에서 검사 후 access token이 유효하면 API 호출을 허락한다.
 3. 만약 access token이 유효하지 않다면, 클라이언트에 access token이 만료되었다는 에러를 보낸다.
 4. access token 만료 에러를 받은 클라이언트는 access token 갱신 api를 보낸다.
