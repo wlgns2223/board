@@ -23,7 +23,7 @@ export class TokenService {
 
   async signToken(payload: ITokenPayload) {
     const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: '10s',
+      expiresIn: '1h',
     });
     const refreshToken = await this.jwtService.signAsync(payload, {
       expiresIn: '7d',

@@ -7,6 +7,7 @@ import {
 } from '../common/exception/serviceException';
 import { JsonWebTokenError, TokenExpiredError } from '@nestjs/jwt';
 import { RefreshToken } from '../users/token.model';
+import { TokenExceptionType } from './types/tokenError.type';
 
 @Injectable()
 export class AuthService {
@@ -41,11 +42,11 @@ export class AuthService {
     } catch (error) {
       this.logger.error(error);
       if (error instanceof TokenExpiredError) {
-        throw TokenException('expired');
+        throw TokenException(TokenExceptionType.EXPIRED);
       }
 
       if (error instanceof JsonWebTokenError) {
-        throw TokenException('invalid');
+        throw TokenException(TokenExceptionType.INVALID_TOKEN);
       }
 
       throw TokenException(error.message);

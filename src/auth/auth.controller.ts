@@ -1,12 +1,14 @@
 import {
   Body,
   Controller,
+  Get,
   Header,
   InternalServerErrorException,
   Logger,
   Post,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dto/signIn.dto';
@@ -15,6 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import { AccessToken } from '../common/decorators/accessToken.decorator';
 import { RefreshTokenFromReq } from '../common/decorators/refreshToken.decorator';
 import { RefreshToken } from '../users/token.model';
+import { AuthGuard } from '../common/guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -54,29 +57,10 @@ export class AuthController {
     });
   }
 
-  @Post('verify')
-  async verify(@AccessToken() token: string, @Res() res: Response) {
-    /**
-     *  1. Refresh Token을 확인한다. Refresh Token이 없거나 만료 된 경우 에러를 리턴한다.
-     *   const isRefrshTokenValid = await this.authService.verifyRefreshToken(userId)
-     *   if(isRefrshTokenValid){
-     *      throw SomeCustomError()
-     *    }
-     *
-     *    const newAccesToken = await this.authService.renewAccessToken(userId)
-     *    res.cookie(tokenName,token, options)
-     *    res.json({message:'success'})
-     *
-     */
-
-    const payload = await this.authService.verifyToken(token);
-
-    return res.json({
-      message: 'success',
-      data: {
-        payload,
-      },
-    });
+  @UseGuards(AuthGuard)
+  @Get('test')
+  async test() {
+    return 'test';
   }
 
   @Post('renew-access-token')
