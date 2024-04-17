@@ -9,18 +9,21 @@ import {
 } from '../error/errors';
 
 /**
+ * 블로그 참고할때에는 Exception이 프로토콜과 관계 없이 사용하도록 Error 클래스를 상속받도록 했지만
+ * 나는 학습목적이므로 HttpException을 상속받도록 했다.
+ * 현재 내가 하려는 프로젝트에서는 HTTP 프로토콜만을 사용한다.
+ */
+
+/**
  * 발생시킬 Custom Exception
  */
+
 export class ServiceException extends HttpException {
   private readonly _error: BaseError;
-  private constructor(error: BaseError, message?: string) {
+  constructor(error: BaseError, message?: string) {
     super(message, error.status);
     error.message = message;
     this._error = error;
-  }
-
-  static of(error: BaseError, message?: string) {
-    return new ServiceException(error, message);
   }
 
   get error() {
@@ -28,28 +31,34 @@ export class ServiceException extends HttpException {
   }
 }
 
+export class AuthException extends ServiceException {
+  constructor(error: BaseError, message?: string) {
+    super(error, message);
+  }
+}
+
 export const EntityNotFoundException = (message?: string) => {
-  return ServiceException.of(ENTITY_NOT_FOUND, message);
+  return new ServiceException(ENTITY_NOT_FOUND, message);
 };
 
 export const MissingDataException = (message?: string) => {
-  return ServiceException.of(INVALID_DATA, message);
+  return new ServiceException(INVALID_DATA, message);
 };
 
 export const EntityAlreadyExistsException = (message?: string) => {
-  return ServiceException.of(ENTITY_ALREADY_EXISTS, message);
+  return new ServiceException(ENTITY_ALREADY_EXISTS, message);
 };
 
 export const UnmatchedPassword = (message?: string) => {
-  return ServiceException.of(UNAUTHORIZED, message);
+  return new ServiceException(UNAUTHORIZED, message);
 };
 
 export const TokenException = (message?: string) => {
-  return ServiceException.of(UNAUTHORIZED, message);
+  return new AuthException(UNAUTHORIZED, message);
 };
 
 export const InternalServerException = (message?: string) => {
-  return ServiceException.of(INTERNAL_SERVER_ERROR, message);
+  return new ServiceException(INTERNAL_SERVER_ERROR, message);
 };
 
 // 에러 클래스를 정의하고 그 에러를 가지는 커스텀 예외를 던진다
