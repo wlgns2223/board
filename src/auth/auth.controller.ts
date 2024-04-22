@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dto/signIn.dto';
-import { Request, Response } from 'express';
+import { CookieOptions, Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { AccessToken } from '../common/decorators/accessToken.decorator';
 import { RefreshTokenFromReq } from '../common/decorators/refreshToken.decorator';
@@ -27,30 +27,48 @@ export class AuthController {
     private configService: ConfigService,
   ) {}
 
+  private getTokenName(tokenType: 'ACCESS' | 'REFRESH') {
+    const tokenName = this.configService.get(`${tokenType}_TOKEN_NAME`);
+    if (!tokenName) {
+      throw new InternalServerErrorException('Wrong Configure !');
+    }
+    return tokenName;
+  }
+
+  private setCookie(
+    res: Response,
+    tokenName: string,
+    token: string,
+    cookieOption: CookieOptions,
+  ) {
+    res.cookie(tokenName, token, cookieOption);
+  }
+
   @Post()
   async signIn(@Body() dto: SignInDto, @Res() res: Response) {
-    const accessTokenName = this.configService.get('ACCESS_TOKEN_NAME');
-    if (!accessTokenName) {
-      throw new InternalServerErrorException('Wrong Configure !');
-    }
-    const refreshTokenName = this.configService.get('REFRESH_TOKEN_NAME');
-    if (!refreshTokenName) {
-      throw new InternalServerErrorException('Wrong Configure !');
-    }
+    const accessTokenName = this.getTokenName('ACCESS');
+    const refreshTokenName = this.getTokenName('REFRESH');
 
     const tokens = await this.authService.signIn(dto.email, dto.password);
 
-    res.cookie(accessTokenName, tokens.accessToken, {
+    const commonCookieOption: CookieOptions = {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === 'production' ? true : false,
       sameSite: 'none',
-    });
+    };
 
-    res.cookie(refreshTokenName, tokens.refreshToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'none',
-    });
+    this.setCookie(
+      res,
+      accessTokenName,
+      tokens.accessToken,
+      commonCookieOption,
+    );
+    this.setCookie(
+      res,
+      refreshTokenName,
+      tokens.refreshToken,
+      commonCookieOption,
+    );
 
     return res.json({
       message: 'success',

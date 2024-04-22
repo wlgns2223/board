@@ -10,9 +10,11 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { AuthException, ServiceException } from '../exception/serviceException';
 import { ModuleRef } from '@nestjs/core';
 import { AuthService } from '../../auth/auth.service';
+import { ServiceException } from '../exception/serviceException';
+import { AuthServiceException } from '../exception/auth.exception';
+import { error } from 'console';
 
 type ExceptionBody = {
   statusCode?: number | HttpStatus;
@@ -21,20 +23,11 @@ type ExceptionBody = {
 };
 
 @Catch(ServiceException)
-@Injectable()
-export class ServiceExceptionHttpFilter
-  implements ExceptionFilter, OnModuleInit
-{
+export class ServiceExceptionHttpFilter implements ExceptionFilter {
   private log: Logger = new Logger(ServiceException.name);
-  private tokenService?: AuthService;
   private _request: Request;
   private _response: Response;
-
-  constructor(private moduleRef: ModuleRef) {}
-
-  onModuleInit() {
-    this.tokenService = this.moduleRef.get(AuthService, { strict: false });
-  }
+  private _exception: ServiceException;
 
   private setRequest(request: Request) {
     this._request = request;
@@ -44,6 +37,10 @@ export class ServiceExceptionHttpFilter
     this._response = response;
   }
 
+  private setException(exception: ServiceException) {
+    this._exception = exception;
+  }
+
   catch(exception: ServiceException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -51,30 +48,46 @@ export class ServiceExceptionHttpFilter
 
     this.setRequest(request);
     this.setResponse(response);
+    this.setException(exception);
+    this.logException();
 
-    const status = exception.error.status;
-
-    this.log.error(exception.stack);
-
-    return response.status(status).json({
-      statusCode: status,
-      message: exception?.error.message || 'no message',
-      path: request.url,
-    } as ExceptionBody);
+    return this.handleResponse();
   }
 
-  private async handleException(exception: ServiceException) {
-    switch (exception.constructor) {
-      case AuthException:
-        return '';
+  private logException() {
+    this.log.error(this._exception.stack);
+  }
+
+  private handleResponse() {
+    switch (this._exception.constructor) {
+      case AuthServiceException:
+        return this.handleAuthServiceException();
+
+      default:
+        return this.handleGeneralException();
     }
   }
 
-  private response(param: Pick<ExceptionBody, 'statusCode' | 'message'>) {
-    const json: ExceptionBody = {
-      ...param,
+  private handleAuthServiceException() {
+    const headerName = 'WWW-Authenticate';
+    const headerBody = `Bearer realm="ACCESS_TOKEN",error=${
+      this._exception.message
+    },errorDescription=${JSON.stringify(this._exception.cause)}`;
+    return this._response
+      .status(this._exception.error.status)
+      .header(headerName, headerBody)
+      .json({
+        statusCode: this._exception.error.status,
+        message: this._exception.error.message,
+        path: this._request.url,
+      } as ExceptionBody);
+  }
+
+  private handleGeneralException() {
+    return this._response.status(this._exception.error.status).json({
+      statusCode: this._exception.error.status,
+      message: this._exception.error.message,
       path: this._request.url,
-    };
-    return this._response.status(param.statusCode).json(json);
+    } as ExceptionBody);
   }
 }

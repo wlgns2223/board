@@ -29,6 +29,7 @@ https://cheese10yun.github.io/spring-guide-exception/
 JWT 토큰 다루기
 https://www.reddit.com/r/reactjs/comments/14r0s8q/when_accesstoken_is_expired_for_jwt_authenication/
 https://inpa.tistory.com/entry/WEB-📚-Access-Token-Refresh-Token-원리-feat-JWT#access_/_refresh_token_재발급_원리
+https://www.ssemi.net/what-is-the-bearer-authentication/
 
 ## 설계한 JWT 토큰 핸들링 학습과 방법
 
@@ -110,6 +111,10 @@ https://inpa.tistory.com/entry/WEB-📚-Access-Token-Refresh-Token-원리-feat-J
 - 2,3번 방법은 코드의 복잡도를 증가시킨다.
 - 쿠키를 통해서 Access Token을 클라이언트에 보내주고 있기때문에 클라이언트가 새로운 토큰을 설정하기 위해서는 어짜피 클라이언트로 Access Token 관련해서 응답이 가야한다. 그렇다면 클라이언트 <-> 백엔드 요청의 횟수로만 따져봤을때는 토큰 재발급 요청을 줄여 요청을 줄여보고자 했던 2,3번방법은 유의미한 이점이 없어보인다.
 
+- 1번방법으로 하되 AuthService에서 AuthServiceException을 리턴한다.
+- Filter에서 AuthServiceException을 잡아서 헤더에 적절한 내용을 넣고 클라이언트에게 에러를 리턴한다.
+  - WWW-Authenticate 헤더를 통해 어떤 부분에서 에러가 났는지 알려준다.
+
 ### 토큰 Refresh 과정
 
 1. 토큰 만료 에러를 받은 클라이언트는 Access Token과 Refresh Token을 가지고 토큰 재발급 요청을 한다.
@@ -120,3 +125,6 @@ https://inpa.tistory.com/entry/WEB-📚-Access-Token-Refresh-Token-원리-feat-J
    3-3. access token 유효, refresh token 만료 -> 로그아웃
 
 # TODO
+
+1. access token refresh api 개발
+2. 위 토큰 refresh 과정을 참고하여 토큰 만료시간을 계산하여 만료가 되기전에 재발급하는 로직을 구현한다.

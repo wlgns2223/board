@@ -24,6 +24,8 @@ async function bootstrap() {
     }),
   );
 
+  app.useGlobalFilters(new ServiceExceptionHttpFilter());
+
   const port = 4000;
   await app.listen(port);
   logger.log(`port: ${port}`);

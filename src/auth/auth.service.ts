@@ -1,13 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { ITokenPayload, TokenPayload, TokenService } from './token.service';
-import {
-  TokenException,
-  UnmatchedPassword,
-} from '../common/exception/serviceException';
+import { UnmatchedPassword } from '../common/exception/serviceException';
 import { JsonWebTokenError, TokenExpiredError } from '@nestjs/jwt';
 import { RefreshToken } from '../users/token.model';
 import { TokenExceptionType } from './types/tokenError.type';
+import { TokenException } from '../common/exception/auth.exception';
 
 @Injectable()
 export class AuthService {
@@ -41,12 +39,17 @@ export class AuthService {
       return await this.tokenService.verifyToken(token);
     } catch (error) {
       this.logger.error(error);
+      this.logger.error('token: ', token);
       if (error instanceof TokenExpiredError) {
         throw TokenException(TokenExceptionType.EXPIRED);
       }
 
       if (error instanceof JsonWebTokenError) {
-        throw TokenException(TokenExceptionType.INVALID_TOKEN);
+        throw TokenException(
+          !!token
+            ? TokenExceptionType.INVALID_TOKEN
+            : TokenExceptionType.UNDEFINED,
+        );
       }
 
       throw TokenException(error.message);

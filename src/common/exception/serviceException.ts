@@ -22,18 +22,15 @@ export class ServiceException extends HttpException {
   private readonly _error: BaseError;
   constructor(error: BaseError, message?: string) {
     super(message, error.status);
-    error.message = message;
+    if (message) {
+      error.message = message;
+    }
+
     this._error = error;
   }
 
   get error() {
     return this._error;
-  }
-}
-
-export class AuthException extends ServiceException {
-  constructor(error: BaseError, message?: string) {
-    super(error, message);
   }
 }
 
@@ -51,10 +48,6 @@ export const EntityAlreadyExistsException = (message?: string) => {
 
 export const UnmatchedPassword = (message?: string) => {
   return new ServiceException(UNAUTHORIZED, message);
-};
-
-export const TokenException = (message?: string) => {
-  return new AuthException(UNAUTHORIZED, message);
 };
 
 export const InternalServerException = (message?: string) => {

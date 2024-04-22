@@ -22,12 +22,6 @@ import { ServiceExceptionHttpFilter } from './common/filter/serviceExceptionHttp
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: APP_FILTER,
-      useClass: ServiceExceptionHttpFilter,
-    },
-  ],
+  providers: [AppService],
 })
 export class AppModule {}
