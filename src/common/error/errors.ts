@@ -1,5 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
-import { BaseError } from './baseError';
+import { AuthError, BaseError } from './baseError';
 
 export const ENTITY_NOT_FOUND = new BaseError(
   HttpStatus.NOT_FOUND,
@@ -11,10 +11,7 @@ export const INVALID_DATA = new BaseError(
   'Data is missing',
 );
 
-export const UNAUTHORIZED = new BaseError(
-  HttpStatus.UNAUTHORIZED,
-  'Unauthorized Request',
-);
+export const UNAUTHORIZED = new AuthError('Unauthorized');
 
 export const INTERNAL_SERVER_ERROR = new BaseError(
   HttpStatus.INTERNAL_SERVER_ERROR,

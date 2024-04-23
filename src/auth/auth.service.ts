@@ -5,7 +5,8 @@ import { UnmatchedPassword } from '../common/exception/serviceException';
 import { JsonWebTokenError, TokenExpiredError } from '@nestjs/jwt';
 import { RefreshToken } from '../users/token.model';
 import { TokenExceptionType } from './types/tokenError.type';
-import { TokenException } from '../common/exception/auth.exception';
+import { TokenException, TokenType } from '../common/exception/auth.exception';
+import { User } from '../users/user.model';
 
 @Injectable()
 export class AuthService {
@@ -25,34 +26,44 @@ export class AuthService {
       throw UnmatchedPassword('Password is not matched');
     }
 
-    const payload = new TokenPayload(userEmail);
-    const tokens = await this.tokenService.signToken(
-      payload.toPlain<ITokenPayload>(),
-    );
-    await this.tokenService.storeToken(tokens.refreshToken, user.id);
+    const accessToken = await this.signAccessToken(userEmail);
+    const refreshToken = await this.signRefreshToken(userEmail);
+    await this.tokenService.storeToken(refreshToken, user.id);
 
-    return tokens;
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 
-  async verifyToken(token: string) {
+  async signAccessToken(userEmail: string) {
+    const payload = new TokenPayload(userEmail);
+    return await this.tokenService.signAccessToken(payload.toPlain());
+  }
+
+  async signRefreshToken(userEmail: string) {
+    const payload = new TokenPayload(userEmail);
+    return await this.tokenService.signRefreshToken(payload.toPlain());
+  }
+
+  async verifyToken(token: string, tokenType: TokenType = 'access') {
     try {
       return await this.tokenService.verifyToken(token);
     } catch (error) {
       this.logger.error(error);
       this.logger.error('token: ', token);
       if (error instanceof TokenExpiredError) {
-        throw TokenException(TokenExceptionType.EXPIRED);
-      }
-
-      if (error instanceof JsonWebTokenError) {
+        throw TokenException(TokenExceptionType.EXPIRED, tokenType);
+      } else if (error instanceof JsonWebTokenError) {
         throw TokenException(
           !!token
             ? TokenExceptionType.INVALID_TOKEN
             : TokenExceptionType.UNDEFINED,
+          tokenType,
         );
+      } else {
+        throw TokenException(error.message, tokenType);
       }
-
-      throw TokenException(error.message);
     }
   }
 

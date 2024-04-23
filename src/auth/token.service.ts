@@ -5,6 +5,7 @@ import { TokenRepository } from '../users/token.repository';
 import { ConfigService } from '@nestjs/config';
 
 export interface ITokenPayload {
+  // email
   sub: string;
 }
 
@@ -21,14 +22,12 @@ export class TokenService {
     private configService: ConfigService,
   ) {}
 
-  async signToken(payload: ITokenPayload) {
-    const accessToken = await this.generateToken(payload, '10s');
-    const refreshToken = await this.generateToken(payload, '7d');
+  async signAccessToken(payload: ITokenPayload) {
+    return await this.generateToken(payload, '10s');
+  }
 
-    return {
-      accessToken,
-      refreshToken,
-    };
+  async signRefreshToken(payload: ITokenPayload) {
+    return await this.generateToken(payload, '7d');
   }
 
   async generateToken(payload: ITokenPayload, expiresIn: string) {

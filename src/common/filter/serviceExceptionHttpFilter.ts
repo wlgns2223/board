@@ -15,6 +15,7 @@ import { AuthService } from '../../auth/auth.service';
 import { ServiceException } from '../exception/serviceException';
 import { AuthServiceException } from '../exception/auth.exception';
 import { error } from 'console';
+import { AuthError } from '../error/baseError';
 
 type ExceptionBody = {
   statusCode?: number | HttpStatus;
@@ -69,8 +70,11 @@ export class ServiceExceptionHttpFilter implements ExceptionFilter {
   }
 
   private handleAuthServiceException() {
+    const authError: AuthError = this._exception.error as AuthError;
+    const tokenType = authError.tokenType;
+    const realm = tokenType === 'access' ? 'ACCESS_TOKEN' : 'REFRESH_TOKEN';
     const headerName = 'WWW-Authenticate';
-    const headerBody = `Bearer realm="ACCESS_TOKEN",error=${
+    const headerBody = `Bearer realm=${realm},error=${
       this._exception.message
     },errorDescription=${JSON.stringify(this._exception.cause)}`;
     return this._response

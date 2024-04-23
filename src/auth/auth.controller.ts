@@ -22,10 +22,66 @@ import { AuthGuard } from '../common/guards/auth.guard';
 @Controller('auth')
 export class AuthController {
   private logger = new Logger(AuthController.name);
+  private commonCookieOption: CookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production' ? true : false,
+    sameSite: 'none',
+  };
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
   ) {}
+
+  @Post()
+  async signIn(@Body() dto: SignInDto, @Res() res: Response) {
+    const accessTokenName = this.getTokenName('ACCESS');
+    const refreshTokenName = this.getTokenName('REFRESH');
+
+    const tokens = await this.authService.signIn(dto.email, dto.password);
+
+    this.setCookie(
+      res,
+      accessTokenName,
+      tokens.accessToken,
+      this.commonCookieOption,
+    );
+    this.setCookie(
+      res,
+      refreshTokenName,
+      tokens.refreshToken,
+      this.commonCookieOption,
+    );
+
+    return res.json({
+      message: 'success',
+    });
+  }
+
+  @Post('renew')
+  async renew(
+    @Res() res: Response,
+    @RefreshTokenFromReq() refreshToken: string,
+  ) {
+    const payload = await this.authService.verifyToken(refreshToken, 'refresh');
+
+    const accessTokenName = this.getTokenName('ACCESS');
+    const newAccessToken = await this.authService.signAccessToken(payload.sub);
+    this.setCookie(
+      res,
+      accessTokenName,
+      newAccessToken,
+      this.commonCookieOption,
+    );
+    return res.json({
+      message: 'success',
+    });
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('test')
+  async test() {
+    return 'test';
+  }
 
   private getTokenName(tokenType: 'ACCESS' | 'REFRESH') {
     const tokenName = this.configService.get(`${tokenType}_TOKEN_NAME`);
@@ -42,51 +98,5 @@ export class AuthController {
     cookieOption: CookieOptions,
   ) {
     res.cookie(tokenName, token, cookieOption);
-  }
-
-  @Post()
-  async signIn(@Body() dto: SignInDto, @Res() res: Response) {
-    const accessTokenName = this.getTokenName('ACCESS');
-    const refreshTokenName = this.getTokenName('REFRESH');
-
-    const tokens = await this.authService.signIn(dto.email, dto.password);
-
-    const commonCookieOption: CookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production' ? true : false,
-      sameSite: 'none',
-    };
-
-    this.setCookie(
-      res,
-      accessTokenName,
-      tokens.accessToken,
-      commonCookieOption,
-    );
-    this.setCookie(
-      res,
-      refreshTokenName,
-      tokens.refreshToken,
-      commonCookieOption,
-    );
-
-    return res.json({
-      message: 'success',
-    });
-  }
-
-  @UseGuards(AuthGuard)
-  @Get('test')
-  async test() {
-    return 'test';
-  }
-
-  @Post('renew-access-token')
-  async renew(@RefreshTokenFromReq() refreshToken: string) {
-    const payload = await this.authService.verifyToken(refreshToken);
-    console.log(payload);
-    const newAccessToken = await this.authService.compareRefreshToken(
-      RefreshToken.from(payload.sub, refreshToken),
-    );
   }
 }
