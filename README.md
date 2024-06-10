@@ -25,6 +25,7 @@ https://jojoldu.tistory.com/610
 에러 핸들링
 https://velog.io/@intellik/NestJS-효과적인-예외-핸들링
 https://cheese10yun.github.io/spring-guide-exception/
+https://jojoldu.tistory.com/734
 
 JWT 토큰 다루기
 https://www.reddit.com/r/reactjs/comments/14r0s8q/when_accesstoken_is_expired_for_jwt_authenication/
@@ -125,6 +126,3 @@ https://www.ssemi.net/what-is-the-bearer-authentication/
    3-3. access token 유효, refresh token 만료 -> 로그아웃
 
 # TODO
-
-1. access token refresh api 개발
-2. 위 토큰 refresh 과정을 참고하여 토큰 만료시간을 계산하여 만료가 되기전에 재발급하는 로직을 구현한다.

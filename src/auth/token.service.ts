@@ -30,7 +30,7 @@ export class TokenService {
     return await this.generateToken(payload, '7d');
   }
 
-  async generateToken(payload: ITokenPayload, expiresIn: string) {
+  private async generateToken(payload: ITokenPayload, expiresIn: string) {
     return await this.jwtService.signAsync(payload, {
       expiresIn,
     });
